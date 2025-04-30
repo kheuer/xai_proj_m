@@ -2,9 +2,10 @@
 This module creates the DataFrames, import them from here.
 """
 
-import pandas as pd
 import os
+from typing import Union
 from PIL import Image
+import pandas as pd
 
 
 # Build the Pacs Dataframe
@@ -28,3 +29,33 @@ for domain in (
 
 
 pacs_df = pd.DataFrame(builder)
+
+
+def split_domains(
+    df: pd.DataFrame, target_domain: str
+) -> Union[pd.DataFrame, pd.DataFrame]:
+    """Splits a DataFrame into two subsets based on a target domain.
+
+    This function takes a DataFrame containing domain information and splits it into
+    two separate DataFrames: one containing rows for the specified target domain
+    and another containing all other domains.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame containing a 'domain' column.
+        target_domain (str): The domain to be used as the target for splitting.
+
+    Returns:
+        Tuple[pd.DataFrame, pd.DataFrame]: A tuple containing two DataFrames:
+            - The first DataFrame contains all rows with the source domain.
+            - The second DataFrame contains only the rows with the target domain.
+
+    Raises:
+        AssertionError: If the target_domain is not found in the unique domains of the DataFrame.
+    """
+    assert target_domain in df["domain"].unique()
+    source_domains = list(df["domain"].unique())
+    source_domains.remove(target_domain)
+
+    df_target = df[df["domain"] == target_domain]
+    df_source = df[df["domain"] != target_domain]
+    return df_source, df_target
