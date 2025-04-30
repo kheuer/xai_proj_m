@@ -1,3 +1,7 @@
+"""
+This module creates the DataFrames, import them from here.
+"""
+
 import pandas as pd
 import os
 from PIL import Image
@@ -6,6 +10,8 @@ from PIL import Image
 # Build the Pacs Dataframe
 builder = {"label": [], "image": [], "domain": []}
 
+# iterate over all files, the labels can be obained from
+# the directory structure.
 for domain in (
     "sketch",
     "photo",
