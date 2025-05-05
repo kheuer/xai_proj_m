@@ -178,3 +178,5 @@ tmp.ipynb
 pacs-dataset.zip
 pacs-dataset/*
 results/*
+*.png
+runs/*
