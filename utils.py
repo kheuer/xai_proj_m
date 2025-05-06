@@ -12,25 +12,43 @@ def show_tensor(tensor):
 
 
 def plot_loss(train_losses, val_losses):
-    plt.figure(figsize=(10, 5))
-    plt.plot(
+    fig, ax = plt.subplots(1, 2, figsize=(15, 5))  # Create a 1x2 subplot
+
+    # Standard Loss Plot
+    ax[0].plot(
         range(1, len(train_losses) + 1), train_losses, label="Training Loss", marker="o"
     )
-    plt.plot(
+    ax[0].plot(
         range(1, len(val_losses) + 1), val_losses, label="Validation Loss", marker="o"
     )
-    plt.title("Training and Validation Loss")
-    plt.xlabel("Epochs")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.grid()
-    plt.savefig("loss.png")
-    plt.show()
+    ax[0].set_title("Training and Validation Loss")
+    ax[0].set_xlabel("Epochs")
+    ax[0].set_ylabel("Loss")
+    ax[0].legend()
+    ax[0].grid()
+
+    # Logarithmic Loss Plot
+    ax[1].plot(
+        range(1, len(train_losses) + 1), train_losses, label="Training Loss", marker="o"
+    )
+    ax[1].plot(
+        range(1, len(val_losses) + 1), val_losses, label="Validation Loss", marker="o"
+    )
+    ax[1].set_title("Training and Validation Loss (Log Scale)")
+    ax[1].set_xlabel("Epochs")
+    ax[1].set_ylabel("Loss")
+    ax[1].set_yscale("log")
+    ax[1].legend()
+    ax[1].grid()
+
+    plt.tight_layout()
+    plt.savefig("loss_comparison.png")
+    # plt.show(block=False)
 
 
 def show_label_distribution(dataloader, classes) -> None:
     df = pd.DataFrame({"labels": dataloader.dataset.tensors[1].cpu()})
-    df["labels"] = df["labels"].apply(lambda x: classes[x])
+    df["labels"] = df["labels"].apply(lambda x: f"{classes[x]}: ({x})")
 
     label_counts = df["labels"].value_counts()
 

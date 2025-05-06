@@ -57,12 +57,37 @@ for domain in (
 pacs_df = pd.DataFrame(builder)
 pacs_classes = pacs_df["labels"].unique().tolist()
 pacs_df["labels"] = pacs_df["labels"].map(lambda x: pacs_classes.index(x))
+pacs_domains = list(pacs_df["domain"].unique())
 
 
-def get_dataloaders(
-    df: pd.DataFrame, test_size: float = 0.2, batch_size: int = 32
+def get_dataloader(
+    df: pd.DataFrame, batch_size: int = 32
 ) -> Union[DataLoader, DataLoader]:
 
+    # Load images and labels into tensors
+    images = []
+    labels = []
+    for index, row in df.iterrows():
+        images.append(
+            load_image(row["image"], move_to_device=False)
+        )  # Do not move to device yet
+        labels.append(row["labels"])
+
+    # Convert lists to tensors
+    images_tensor = torch.cat(images)
+
+    labels_tensor = torch.tensor(labels, dtype=torch.long).to(device)
+
+    # Create Tensor Datasets
+    dataset = TensorDataset(images_tensor, labels_tensor)
+
+    # Create DataLoaders
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+    return loader
+
+
+def split_df(df: pd.DataFrame, test_size: float = 0.2):
     # Shuffle the DataFrame
     df_shuffled = df.sample(frac=1).reset_index(drop=True)
     train_size = 1 - test_size
@@ -73,45 +98,7 @@ def get_dataloaders(
     # Split the DataFrame into training and testing sets
     train_df = df_shuffled[:split_index].reset_index(drop=True)
     test_df = df_shuffled[split_index:].reset_index(drop=True)
-
-    # train_df["image"] = train_df["image"].apply(load_image)
-    # test_df["image"] = test_df["image"].apply(load_image)
-
-    # Load images and labels into tensors
-    train_images = []
-    train_labels = []
-    for index, row in train_df.iterrows():
-        train_images.append(
-            load_image(row["image"], move_to_device=False)
-        )  # Do not move to device yet
-        train_labels.append(row["labels"])
-
-    test_images = []
-    test_labels = []
-    for index, row in test_df.iterrows():
-        test_images.append(
-            load_image(row["image"], move_to_device=False)
-        )  # Do not move to device yet
-        test_labels.append(row["labels"])
-
-    # Convert lists to tensors
-    train_images_tensor = torch.cat(
-        train_images
-    )  # Concatenate tensors along the first dimension
-    test_images_tensor = torch.cat(test_images)
-
-    train_labels_tensor = torch.tensor(train_labels, dtype=torch.long).to(device)
-    test_labels_tensor = torch.tensor(test_labels, dtype=torch.long).to(device)
-
-    # Create Tensor Datasets
-    train_dataset = TensorDataset(train_images_tensor, train_labels_tensor)
-    test_dataset = TensorDataset(test_images_tensor, test_labels_tensor)
-
-    # Create DataLoaders
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
-
-    return train_loader, test_loader
+    return train_df, test_df
 
 
 def create_dataset(df: pd.DataFrame, test_size: float = None) -> Dataset:
