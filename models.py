@@ -3,9 +3,7 @@ from IPython.display import clear_output
 import torch
 from torch import nn
 import torchvision
-from dataset_utils import (
-    pacs_classes,
-)
+from dataset_utils import all_datasets
 from cuda import device
 from utils import plot_loss
 from sklearn.utils.class_weight import compute_class_weight
@@ -17,9 +15,24 @@ def get_resnet_18(
     weights: Union[str, None] = "ResNet18_Weights.DEFAULT",
 ) -> torchvision.models.resnet18:
     resnet18 = torchvision.models.resnet18(weights=weights)
-    resnet18.fc = nn.Linear(resnet18.fc.in_features, len(pacs_classes))
+    resnet18.fc = nn.Linear(
+        resnet18.fc.in_features,
+        len(all_datasets["pacs"]["classes"]),
+    )
     resnet18.to(device)
     return resnet18
+
+
+def get_resnet_50(
+    weights: Union[str, None] = "ResNet50_Weights.DEFAULT",
+) -> torchvision.models.resnet50:
+    resnet50 = torchvision.models.resnet50(weights=weights)
+    resnet50.fc = nn.Linear(
+        resnet50.fc.in_features,
+        len(all_datasets["pacs"]["classes"]),
+    )
+    resnet50.to(device)
+    return resnet50
 
 
 def calculate_val_loss(

@@ -1,3 +1,4 @@
+from typing import Union, List
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -57,3 +58,19 @@ def show_label_distribution(dataloader, classes) -> None:
     plt.title("Label distribution")
     plt.axis("equal")
     plt.show()
+
+
+def get_expected_input(prompt: str, options: List[str]) -> str:
+    choice = -1
+    while int(choice) not in range(1, len(options) + 1, 1):
+        choice = input(
+            prompt
+            + " "
+            + " ".join([f"[{i+1}] {x}" for i, x in enumerate(options)])
+            + " "
+        ).strip()
+        try:
+            int(choice)
+        except ValueError:
+            choice = -1
+    return options[int(choice) - 1]

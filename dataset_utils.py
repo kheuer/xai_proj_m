@@ -57,7 +57,14 @@ for domain in (
 pacs_df = pd.DataFrame(builder)
 pacs_classes = pacs_df["labels"].unique().tolist()
 pacs_df["labels"] = pacs_df["labels"].map(lambda x: pacs_classes.index(x))
-pacs_domains = list(pacs_df["domain"].unique())
+
+all_datasets = {
+    "pacs": {
+        "df": pacs_df,
+        "classes": pacs_classes,
+        "domains": list(pacs_df["domain"].unique()),
+    }
+}
 
 
 def get_dataloader(
