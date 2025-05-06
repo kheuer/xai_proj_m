@@ -180,4 +180,3 @@ pacs-dataset/*
 results/*
 *.png
 runs/*
-optuna_logs/*
