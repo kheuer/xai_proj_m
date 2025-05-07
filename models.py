@@ -164,7 +164,7 @@ def calculate_val_loss(
 
 
 def _do_train(
-    model: torch.model,
+    model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
     optimizer: torch.optim,
     scheduler: torch.optim.lr_scheduler,
@@ -192,7 +192,7 @@ def _do_train(
 
 
 def _do_eval(
-    model: torch.model,
+    model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
     test_loader: torch.utils.data.DataLoader,
 ):

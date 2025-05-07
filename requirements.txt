@@ -2,3 +2,4 @@ pandas
 Pillow
 tensorboard
 optuna
+torchvision

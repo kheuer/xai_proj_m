@@ -63,9 +63,9 @@ def objective(trial):
             "SCHEDULER",
             ["CosineAnnealingLR", "ReduceLROnPlateau", "LinearLR", "StepLR", "None"],
         ),
-        "MOMENTUM": trial.suggest_float("MOMENTUM", [0.5, 0.9]),
-        "DAMPENING": trial.suggest_float("DAMPENING", [0, 0.2]),
-        "GAMMA": trial.suggest_float("GAMMA", [0.1, 0.9]),
+        "MOMENTUM": trial.suggest_float("MOMENTUM", 0.5, 0.9),
+        "DAMPENING": trial.suggest_float("DAMPENING", 0, 0.2),
+        "GAMMA": trial.suggest_float("GAMMA", 0.1, 0.9),
     }
 
     train_loader = get_dataloader(train_df, batch_size=params["BATCH_SIZE"])
