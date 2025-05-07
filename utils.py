@@ -44,6 +44,7 @@ def plot_loss(train_losses, val_losses):
 
     plt.tight_layout()
     plt.savefig("loss_comparison.png")
+    plt.close()
     # plt.show(block=False)
 
 
