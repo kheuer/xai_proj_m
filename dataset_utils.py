@@ -5,12 +5,16 @@ This module creates the DataFrames, import them from here.
 import os
 from typing import Union
 from PIL import Image
+import numpy as np
 import pandas as pd
 from datasets import Dataset
 from torchvision import transforms
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from cuda import device
+
+
+np.random.seed(42)
 
 transform_to_tensor = transforms.ToTensor()
 transform_to_pil = transforms.ToPILImage()

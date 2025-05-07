@@ -1,8 +1,10 @@
 """this module optimizes the hyperparameters"""
 
-import optuna
 import os
+from datetime import datetime
+import optuna
 from utils import get_expected_input
+from dataset_utils import split_domains, get_dataloader, split_df
 from models import (
     get_resnet_18,
     get_resnet_50,
@@ -11,8 +13,6 @@ from models import (
     MAX_EPOCHS,
     PATIENCE,
 )
-from dataset_utils import split_domains, get_dataloader
-from datetime import datetime
 
 
 model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
@@ -30,7 +30,11 @@ STUDY_NAME = (
 )
 
 train_df, test_df = split_domains(dataset["df"], target_domain)
-# train_df, test_df = split_df(all_datasets["pacs"]["df"], test_size=0.2)
+
+
+# take a random sample to speed up training
+_, train_df = split_df(train_df, test_size=0.2)
+_, test_df = split_df(test_df, test_size=0.4)
 
 
 def objective(trial):
@@ -47,7 +51,7 @@ def objective(trial):
     params = {
         "EPOCHS": MAX_EPOCHS,
         "PATIENCE": PATIENCE,
-        "LEARNING_RATE": trial.suggest_float("LEARNING_RATE", 0.000001, 0.1),
+        "LEARNING_RATE": trial.suggest_float("LEARNING_RATE", 0.000001, 0.01),
         "BETAS": (
             trial.suggest_categorical("BETA_1", [0.8, 0.9, 0.95]),
             trial.suggest_categorical("BETA_2", [0.99, 0.999, 0.9999]),
@@ -61,7 +65,7 @@ def objective(trial):
         ),
         "MOMENTUM": trial.suggest_float("MOMENTUM", [0.5, 0.9]),
         "DAMPENING": trial.suggest_float("DAMPENING", [0, 0.2]),
-        "GAMMA": trial.suggest_float("GAMME", [0.1, 0.9]),
+        "GAMMA": trial.suggest_float("GAMMA", [0.1, 0.9]),
     }
 
     train_loader = get_dataloader(train_df, batch_size=params["BATCH_SIZE"])
