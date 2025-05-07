@@ -107,6 +107,7 @@ def calculate_val_loss(
         case "None":
             scheduler = NoScheduler()
 
+    # create the loss function and correct for inballances in the training dataset by using weights
     y = train_loader.dataset.tensors[1].cpu().tolist()
     weights = compute_class_weight(class_weight="balanced", classes=np.unique(y), y=y)
     weights = torch.Tensor(weights).to(device)
@@ -117,46 +118,39 @@ def calculate_val_loss(
     epochs_without_improvement = 0
     best_model_weights = None
 
-    # Lists to store training and validation loss for plotting
     train_losses = []
     val_losses = []
 
     # Training Loop
     for epoch in range(HYPERPARAMS["EPOCHS"]):
-        model.train(True)
-        running_loss = 0.0
-        for features, labels in train_loader:
-            features, labels = features.to(device), labels.to(device)
 
-            optimizer.zero_grad()
-            outputs = model(features)
+        # Train the model
+        train_losses.append(
+            _do_train(
+                model=model,
+                criterion=criterion,
+                optimizer=optimizer,
+                scheduler=scheduler,
+                train_loader=train_loader,
+            )
+        )
 
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
-
-            running_loss += loss.item()
-
-        scheduler.step()
         # Validate the model
-        model.eval()  # Switch to evaluation mode
-        validation_loss = 0.0
-        with torch.no_grad():
-            for features, labels in test_loader:
-                features, labels = features.to(device), labels.to(device)
-                outputs = model(features)
-                loss = criterion(outputs, labels)
-                validation_loss += loss.item()
+        val_losses.append(
+            _do_eval(
+                model=model,
+                criterion=criterion,
+                test_loader=test_loader,
+            )
+        )
 
-        train_losses.append(running_loss / len(train_loader))
-        val_losses.append(validation_loss / len(test_loader))
-
+        # clear cell in case this is run in a jupyter notebook
         clear_output(wait=True)
         plot_loss(train_losses, val_losses)
 
         # Early Stopping Check
-        if validation_loss < best_loss:
-            best_loss = validation_loss
+        if val_losses[-1] < best_loss:
+            best_loss = val_losses[-1]
             epochs_without_improvement = 0
             best_model_weights = model.state_dict()  # Save the best model
         else:
@@ -166,4 +160,49 @@ def calculate_val_loss(
 
     # Load the best model weights
     # MODEL.load_state_dict(best_model_weights)
-    return best_loss / len(test_loader)
+    return best_loss
+
+
+def _do_train(
+    model: torch.model,
+    criterion: torch.nn.CrossEntropyLoss,
+    optimizer: torch.optim,
+    scheduler: torch.optim.lr_scheduler,
+    train_loader: torch.utils.data.DataLoader,
+):
+    model.train(True)
+    running_loss = 0.0
+    for features, labels in train_loader:
+        # TODO: investigate if this is a performance bottleneck
+        # and if the entire dataloader can be stored on the GPU together with the model
+        features, labels = features.to(device), labels.to(device)
+
+        optimizer.zero_grad()
+        outputs = model(features)
+
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+
+    scheduler.step()
+
+    return running_loss / len(train_loader)
+
+
+def _do_eval(
+    model: torch.model,
+    criterion: torch.nn.CrossEntropyLoss,
+    test_loader: torch.utils.data.DataLoader,
+):
+    model.eval()  # Switch to evaluation mode
+    validation_loss = 0.0
+    with torch.no_grad():
+        for features, labels in test_loader:
+            features, labels = features.to(device), labels.to(device)
+            outputs = model(features)
+            loss = criterion(outputs, labels)
+            validation_loss += loss.item()
+
+    return validation_loss / len(test_loader)
