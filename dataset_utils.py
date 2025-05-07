@@ -2,6 +2,7 @@
 This module creates the DataFrames, import them from here.
 """
 
+import random
 import os
 from typing import Union
 from PIL import Image
@@ -13,8 +14,9 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from cuda import device
 
-
+random.seed(42)
 np.random.seed(42)
+torch.manual_seed(42)
 
 transform_to_tensor = transforms.ToTensor()
 transform_to_pil = transforms.ToPILImage()
