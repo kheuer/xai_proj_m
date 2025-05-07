@@ -11,6 +11,10 @@ from torch.utils.data import DataLoader
 import numpy as np
 
 
+MAX_EPOCHS = 100
+PATIENCE = 20
+
+
 def get_resnet_18(
     weights: Union[str, None] = "ResNet18_Weights.DEFAULT",
 ) -> torchvision.models.resnet18:
@@ -35,6 +39,14 @@ def get_resnet_50(
     return resnet50
 
 
+class NoScheduler:
+    def __init__(self):
+        pass
+
+    def step(self):
+        pass
+
+
 def calculate_val_loss(
     train_loader: DataLoader,
     test_loader: DataLoader,
@@ -42,13 +54,58 @@ def calculate_val_loss(
     HYPERPARAMS: dict,
 ) -> float:
 
-    optimizer = torch.optim.Adam(
-        model.parameters(),
-        lr=HYPERPARAMS["LEARNING_RATE"],
-        betas=HYPERPARAMS["BETAS"],
-        weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
-        maximize=False,
-    )
+    match HYPERPARAMS["OPTIMIZER"]:
+        case "AdamW":
+            optimizer = torch.optim.AdamW(
+                model.parameters(),
+                lr=HYPERPARAMS["LEARNING_RATE"],
+                betas=HYPERPARAMS["BETAS"],
+                # weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
+                maximize=False,
+            )
+        case "SGD":
+            optimizer = torch.optim.SGD(
+                model.parameters(),
+                lr=HYPERPARAMS["LEARNING_RATE"],
+                momentum=HYPERPARAMS["MOMENTUM"],
+                dampening=HYPERPARAMS["DAMPENING"],
+                # weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
+                maximize=False,
+            )
+
+    match HYPERPARAMS["SCHEDULER"]:
+        case "CosineAnnealingLR":
+            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                optimizer, MAX_EPOCHS, eta_min=0.0, last_epoch=-1
+            )
+        case "StepLR":
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer,
+                HYPERPARAMS["STEP_SIZE"],
+                gamma=HYPERPARAMS["GAMMA"],
+                last_epoch=-1,
+            )
+        case "ReduceLROnPlateau":
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                mode="min",
+                factor=HYPERPARAMS["GAMMA"],
+                patience=PATIENCE,
+                threshold=0.0001,  # default
+                threshold_mode="rel",
+                cooldown=0,  # default
+                min_lr=0,  # default
+            )
+        case "LinearLR":
+            scheduler = torch.optim.lr_scheduler.LinearLR(
+                optimizer,
+                start_factor=1 / 3,  # default
+                end_factor=1.0,  # default
+                total_iters=8,
+                last_epoch=-1,  # default
+            )
+        case "None":
+            scheduler = NoScheduler()
 
     y = train_loader.dataset.tensors[1].cpu().tolist()
     weights = compute_class_weight(class_weight="balanced", classes=np.unique(y), y=y)
@@ -80,6 +137,7 @@ def calculate_val_loss(
 
             running_loss += loss.item()
 
+        scheduler.step()
         # Validate the model
         model.eval()  # Switch to evaluation mode
         validation_loss = 0.0

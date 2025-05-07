@@ -3,7 +3,14 @@
 import optuna
 import os
 from utils import get_expected_input
-from models import get_resnet_18, get_resnet_50, all_datasets, calculate_val_loss
+from models import (
+    get_resnet_18,
+    get_resnet_50,
+    all_datasets,
+    calculate_val_loss,
+    MAX_EPOCHS,
+    PATIENCE,
+)
 from dataset_utils import split_domains, get_dataloader
 from datetime import datetime
 
@@ -38,15 +45,23 @@ def objective(trial):
     """
 
     params = {
-        "EPOCHS": 100,
-        "PATIENCE": 20,
+        "EPOCHS": MAX_EPOCHS,
+        "PATIENCE": PATIENCE,
         "LEARNING_RATE": trial.suggest_float("LEARNING_RATE", 0.000001, 0.1),
         "BETAS": (
             trial.suggest_categorical("BETA_1", [0.8, 0.9, 0.95]),
             trial.suggest_categorical("BETA_2", [0.99, 0.999, 0.9999]),
         ),
-        "WEIGHT_DECAY": trial.suggest_float("WEIGHT_DECAY", 0.0, 0.1),
+        # "WEIGHT_DECAY": trial.suggest_float("WEIGHT_DECAY", 0.0, 0.1),
         "BATCH_SIZE": trial.suggest_categorical("BATCH_SIZE", [16, 32, 64, 128, 256]),
+        "OPTIMIZER": trial.suggest_categorical("OPTIMIZER", ["AdamW", "SGD"]),
+        "SCHEDULER": trial.suggest_categorical(
+            "SCHEDULER",
+            ["CosineAnnealingLR", "ReduceLROnPlateau", "LinearLR", "StepLR", "None"],
+        ),
+        "MOMENTUM": trial.suggest_float("MOMENTUM", [0.5, 0.9]),
+        "DAMPENING": trial.suggest_float("DAMPENING", [0, 0.2]),
+        "GAMMA": trial.suggest_float("GAMME", [0.1, 0.9]),
     }
 
     train_loader = get_dataloader(train_df, batch_size=params["BATCH_SIZE"])
