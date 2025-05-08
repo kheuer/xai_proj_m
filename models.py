@@ -169,7 +169,7 @@ def _do_train(
     optimizer: torch.optim,
     scheduler: torch.optim.lr_scheduler,
     train_loader: torch.utils.data.DataLoader,
-):
+) -> float:
     model.train(True)
     running_loss = 0.0
     for features, labels in train_loader:
@@ -195,7 +195,7 @@ def _do_eval(
     model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
     test_loader: torch.utils.data.DataLoader,
-):
+) -> float:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
     with torch.no_grad():

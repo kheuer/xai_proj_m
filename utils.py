@@ -1,3 +1,4 @@
+from ast import literal_eval
 from typing import Union, List
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -75,3 +76,44 @@ def get_expected_input(prompt: str, options: List[str]) -> str:
         except ValueError:
             choice = -1
     return options[int(choice) - 1]
+
+
+def parse_params(data):
+    try:
+        return literal_eval(data[data.index("{") :])
+    except SyntaxError:
+        raise ValueError("The data contains no well formated key-value pair")
+
+
+def get_params_from_user():
+    while True:
+        try:
+            params = parse_params(input("Please insert the paramers dictionary: "))
+            assert isinstance(params["EPOCHS"], float)
+            assert isinstance(params["PATIENCE"], int)
+            assert isinstance(params["LEARNING_RATE"], float)
+            assert isinstance(params["BETA_1"], float)
+            assert isinstance(params["BETA_2"], float)
+            assert isinstance(params["BATCH_SIZE"], int)
+            assert params["OPTIMIZER"] in ("AdamW", "SGD")
+            assert params["SCHEDULER"] in (
+                "CosineAnnealingLR",
+                "ReduceLROnPlateau",
+                "LinearLR",
+                "StepLR",
+                "None",
+            )
+
+            if params["OPTIMIZER"] == "SGD":
+                assert isinstance(params["MOMENTUM"], float)
+                assert isinstance(params["DAMPENING"], float)
+
+            if params["SCHEDULER"] in ("StepLR", "ReduceLROnPlateau"):
+                assert isinstance(params["GAMMA"], float)
+            if params["SCHEDULER"] == "StepLR":
+                assert isinstance(params["STEP_SIZE"], int)
+            params["BETAS"] = (params["BETA_1"], params["BETA_2"])
+            return params
+
+        except (ValueError, AssertionError, KeyError):
+            continue
