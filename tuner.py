@@ -10,10 +10,8 @@ from models import (
     get_resnet_50,
     all_datasets,
     calculate_val_loss,
-    MAX_EPOCHS,
-    PATIENCE,
 )
-
+from config import MAX_EPOCHS, PATIENCE
 
 model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
 
@@ -22,7 +20,7 @@ dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 
 target_domain = get_expected_input(
-    "Please choose te target domain:", dataset["domains"]
+    "Please choose the target domain:", dataset["domains"]
 )
 
 STUDY_NAME = (
@@ -66,6 +64,7 @@ def objective(trial):
         "MOMENTUM": trial.suggest_float("MOMENTUM", 0.5, 0.9),
         "DAMPENING": trial.suggest_float("DAMPENING", 0, 0.2),
         "GAMMA": trial.suggest_float("GAMMA", 0.1, 0.9),
+        "STEP_SIZE": trial.suggest_int("STEP_SIZE", 5, 50),
     }
 
     train_loader = get_dataloader(train_df, batch_size=params["BATCH_SIZE"])

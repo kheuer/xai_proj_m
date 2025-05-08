@@ -2,6 +2,7 @@ from ast import literal_eval
 from typing import Union, List
 import matplotlib.pyplot as plt
 import pandas as pd
+from config import MAX_EPOCHS, PATIENCE
 
 
 def show_tensor(tensor):
@@ -86,34 +87,59 @@ def parse_params(data):
 
 
 def get_params_from_user():
-    while True:
-        try:
-            params = parse_params(input("Please insert the paramers dictionary: "))
-            assert isinstance(params["EPOCHS"], float)
-            assert isinstance(params["PATIENCE"], int)
-            assert isinstance(params["LEARNING_RATE"], float)
-            assert isinstance(params["BETA_1"], float)
-            assert isinstance(params["BETA_2"], float)
-            assert isinstance(params["BATCH_SIZE"], int)
-            assert params["OPTIMIZER"] in ("AdamW", "SGD")
-            assert params["SCHEDULER"] in (
-                "CosineAnnealingLR",
-                "ReduceLROnPlateau",
-                "LinearLR",
-                "StepLR",
-                "None",
-            )
+    try:
+        parsed = parse_params(input("Please insert the paramers dictionary: "))
+        params = {}
+        if "EPOCHS" in parsed:
+            assert isinstance(parsed["EPOCHS"], int)
+            params["EPOCHS"] = parsed["EPOCHS"]
+        else:
+            params["EPOCHS"] = MAX_EPOCHS
 
-            if params["OPTIMIZER"] == "SGD":
-                assert isinstance(params["MOMENTUM"], float)
-                assert isinstance(params["DAMPENING"], float)
+        if "PATIENCE" in parsed:
+            assert isinstance(parsed["PATIENCE"], int)
+            params["PATIENCE"] = parsed["PATIENCE"]
+        else:
+            params["PATIENCE"] = PATIENCE
 
-            if params["SCHEDULER"] in ("StepLR", "ReduceLROnPlateau"):
-                assert isinstance(params["GAMMA"], float)
-            if params["SCHEDULER"] == "StepLR":
-                assert isinstance(params["STEP_SIZE"], int)
-            params["BETAS"] = (params["BETA_1"], params["BETA_2"])
-            return params
+        assert isinstance(parsed["LEARNING_RATE"], float)
+        params["LEARNING_RATE"] = parsed["LEARNING_RATE"]
 
-        except (ValueError, AssertionError, KeyError):
-            continue
+        assert isinstance(parsed["BETA_1"], float)
+        assert isinstance(parsed["BETA_2"], float)
+        params["BETAS"] = (parsed["BETA_1"], parsed["BETA_2"])
+
+        assert isinstance(parsed["BATCH_SIZE"], int)
+        params["BATCH_SIZE"] = parsed["BATCH_SIZE"]
+
+        assert parsed["OPTIMIZER"] in ("AdamW", "SGD")
+        params["OPTIMIZER"] = parsed["OPTIMIZER"]
+
+        assert parsed["SCHEDULER"] in (
+            "CosineAnnealingLR",
+            "ReduceLROnPlateau",
+            "LinearLR",
+            "StepLR",
+            "None",
+        )
+        params["SCHEDULER"] = parsed["SCHEDULER"]
+
+        if params["OPTIMIZER"] == "SGD":
+            assert isinstance(parsed["MOMENTUM"], float)
+            params["MOMENTUM"] = parsed["MOMENTUM"]
+
+            assert isinstance(parsed["DAMPENING"], float)
+            params["DAMPENING"] = parsed["DAMPENING"]
+
+        if parsed["SCHEDULER"] in ("StepLR", "ReduceLROnPlateau"):
+            assert isinstance(parsed["GAMMA"], float)
+            params["GAMMA"] = parsed["GAMMA"]
+
+        if parsed["SCHEDULER"] == "StepLR":
+            assert isinstance(parsed["STEP_SIZE"], int)
+            params["STEP_SIZE"] = parsed["STEP_SIZE"]
+
+        return params
+
+    except ValueError:
+        raise ValueError("This dictionary is not well formated")

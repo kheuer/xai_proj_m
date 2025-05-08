@@ -9,10 +9,13 @@ dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 
 target_domain = get_expected_input(
-    "Please choose te target domain:", dataset["domains"]
+    "Please choose the target domain:", dataset["domains"]
 )
 
 params = get_params_from_user()
+print(
+    f"\n\n\nTrain {model_name} model with target_domain = {target_domain} and Hyperparameters = {params}"
+)
 
 train_df, test_df = split_domains(dataset["df"], target_domain)
 
@@ -27,3 +30,5 @@ model = get_resnet_18()
 loss = calculate_val_loss(
     train_loader=train_loader, test_loader=test_loader, model=model, HYPERPARAMS=params
 )
+
+print("Final validation loss:", loss)

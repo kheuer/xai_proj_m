@@ -11,10 +11,6 @@ from torch.utils.data import DataLoader
 import numpy as np
 
 
-MAX_EPOCHS = 100
-PATIENCE = 20
-
-
 def get_resnet_18(
     weights: Union[str, None] = "ResNet18_Weights.DEFAULT",
 ) -> torchvision.models.resnet18:
@@ -76,7 +72,7 @@ def calculate_val_loss(
     match HYPERPARAMS["SCHEDULER"]:
         case "CosineAnnealingLR":
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-                optimizer, MAX_EPOCHS, eta_min=0.0, last_epoch=-1
+                optimizer, HYPERPARAMS["EPOCHS"], eta_min=0.0, last_epoch=-1
             )
         case "StepLR":
             scheduler = torch.optim.lr_scheduler.StepLR(
@@ -90,7 +86,7 @@ def calculate_val_loss(
                 optimizer,
                 mode="min",
                 factor=HYPERPARAMS["GAMMA"],
-                patience=PATIENCE,
+                patience=HYPERPARAMS["PATIENCE"],
                 threshold=0.0001,  # default
                 threshold_mode="rel",
                 cooldown=0,  # default
@@ -130,7 +126,6 @@ def calculate_val_loss(
                 model=model,
                 criterion=criterion,
                 optimizer=optimizer,
-                scheduler=scheduler,
                 train_loader=train_loader,
             )
         )
@@ -143,6 +138,12 @@ def calculate_val_loss(
                 test_loader=test_loader,
             )
         )
+
+        match HYPERPARAMS["SCHEDULER"]:
+            case "ReduceLROnPlateau":
+                scheduler.step(val_losses[-1])
+            case _:
+                scheduler.step()
 
         # clear cell in case this is run in a jupyter notebook
         clear_output(wait=True)
@@ -167,7 +168,6 @@ def _do_train(
     model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
     optimizer: torch.optim,
-    scheduler: torch.optim.lr_scheduler,
     train_loader: torch.utils.data.DataLoader,
 ) -> float:
     model.train(True)
@@ -185,8 +185,6 @@ def _do_train(
         optimizer.step()
 
         running_loss += loss.item()
-
-    scheduler.step()
 
     return running_loss / len(train_loader)
 
