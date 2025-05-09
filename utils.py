@@ -156,10 +156,16 @@ def split_df_into_loaders(
     )
 
     df_source, df_target = split_domains(df, target_domain)
+    train_df, source_domain_test_df = split_df(df_source, test_size=0.15)
 
-    train_loader = get_dataloader(df_source, batch_size=BATCH_SIZE)
+    train_loader = get_dataloader(train_df, batch_size=BATCH_SIZE)
 
-    test_df, val_df = split_df(df_target, test_size=0.4)
+    target_domain_test_df, val_df = split_df(df_target, test_size=0.4)
+
+    test_df = pd.concat((source_domain_test_df, target_domain_test_df)).reset_index(
+        drop=True
+    )
+
     test_loader = get_dataloader(test_df, batch_size=BATCH_SIZE)
     val_loader = get_dataloader(val_df, batch_size=BATCH_SIZE)
     return train_loader, test_loader, val_loader, target_domain
