@@ -154,7 +154,7 @@ def calculate_val_loss(
         if val_losses[-1] < best_loss:
             best_loss = val_losses[-1]
             epochs_without_improvement = 0
-            best_model_weights = model.state_dict()  # Save the best model
+            best_model_weights = model.state_dict().copy()  # Save the best model
         else:
             epochs_without_improvement += 1
             if epochs_without_improvement >= HYPERPARAMS["PATIENCE"]:
@@ -178,10 +178,6 @@ def _do_train(
     model.train(True)
     running_loss = 0.0
     for features, labels in train_loader:
-        # TODO: investigate if this is a performance bottleneck
-        # and if the entire dataloader can be stored on the GPU together with the model
-        features, labels = features.to(device), labels.to(device)
-
         optimizer.zero_grad()
         outputs = model(features)
 
@@ -203,7 +199,6 @@ def _do_eval(
     validation_loss = 0.0
     with torch.no_grad():
         for features, labels in test_loader:
-            features, labels = features.to(device), labels.to(device)
             outputs = model(features)
             loss = criterion(outputs, labels)
             validation_loss += loss.item()

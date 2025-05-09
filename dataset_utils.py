@@ -90,7 +90,7 @@ def get_dataloader(
         labels.append(row["labels"])
 
     # Convert lists to tensors
-    images_tensor = torch.cat(images)
+    images_tensor = torch.cat(images).to(device)
 
     labels_tensor = torch.tensor(labels, dtype=torch.long).to(device)
 
