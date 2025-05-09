@@ -1,5 +1,6 @@
 import numpy as np
 from math import sqrt
+import torchvision.transforms.v2 as T
 
 
 def colorful_spectrum_mix(img1, img2, alpha, ratio=1.0):
@@ -44,3 +45,19 @@ def colorful_spectrum_mix(img1, img2, alpha, ratio=1.0):
     img12 = np.uint8(np.clip(img12, 0, 255))
 
     return img21, img12
+
+
+transform_pipeline = T.Compose(
+    [
+        T.RandomResizedCrop(224, scale=(0.8, 1.0), ratio=(0.75, 1.33)),
+        T.RandomHorizontalFlip(),
+        T.RandomRotation(15),
+        T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        T.RandomGrayscale(p=0.1),
+        T.GaussianBlur(kernel_size=(3, 3), sigma=(0.1, 2.0)),
+        T.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225],
+        ),
+    ]
+)

@@ -111,8 +111,8 @@ def get_params_from_user():
         assert isinstance(parsed["BETA_2"], float)
         params["BETAS"] = (parsed["BETA_1"], parsed["BETA_2"])
 
-        assert isinstance(parsed["BATCH_SIZE"], int)
-        params["BATCH_SIZE"] = parsed["BATCH_SIZE"]
+        assert isinstance(parsed["WEIGHT_DECAY"], float)
+        params["WEIGHT_DECAY"] = parsed["WEIGHT_DECAY"]
 
         assert parsed["OPTIMIZER"] in ("AdamW", "SGD")
         params["OPTIMIZER"] = parsed["OPTIMIZER"]

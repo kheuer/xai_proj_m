@@ -48,7 +48,7 @@ def objective(trial):
             trial.suggest_categorical("BETA_1", [0.8, 0.9, 0.95]),
             trial.suggest_categorical("BETA_2", [0.99, 0.999, 0.9999]),
         ),
-        # "WEIGHT_DECAY": trial.suggest_float("WEIGHT_DECAY", 0.0, 0.1),
+        "WEIGHT_DECAY": trial.suggest_float("WEIGHT_DECAY", 0.0, 0.1),
         "OPTIMIZER": trial.suggest_categorical("OPTIMIZER", ["AdamW", "SGD"]),
         "SCHEDULER": trial.suggest_categorical(
             "SCHEDULER",

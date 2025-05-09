@@ -9,15 +9,19 @@ from utils import plot_loss
 from sklearn.utils.class_weight import compute_class_weight
 from torch.utils.data import DataLoader
 import numpy as np
+from transformation_utils import transform_pipeline
 
 
 def get_resnet_18(
     weights: Union[str, None] = None,
 ) -> torchvision.models.resnet18:
     resnet18 = torchvision.models.resnet18(weights=weights)
-    resnet18.fc = nn.Linear(
-        resnet18.fc.in_features,
-        len(all_datasets["pacs"]["classes"]),
+    resnet18.fc = nn.Sequential(
+        nn.Dropout(0.5),
+        nn.Linear(
+            resnet18.fc.in_features,
+            len(all_datasets["pacs"]["classes"]),
+        ),
     )
     resnet18.to(device)
     return resnet18
@@ -27,9 +31,12 @@ def get_resnet_50(
     weights: Union[str, None] = None,
 ) -> torchvision.models.resnet50:
     resnet50 = torchvision.models.resnet50(weights=weights)
-    resnet50.fc = nn.Linear(
-        resnet50.fc.in_features,
-        len(all_datasets["pacs"]["classes"]),
+    resnet50.fc = nn.Sequential(
+        nn.Dropout(0.5),
+        nn.Linear(
+            resnet50.fc.in_features,
+            len(all_datasets["pacs"]["classes"]),
+        ),
     )
     resnet50.to(device)
     return resnet50
@@ -57,7 +64,7 @@ def calculate_val_loss(
                 model.parameters(),
                 lr=HYPERPARAMS["LEARNING_RATE"],
                 betas=HYPERPARAMS["BETAS"],
-                # weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
+                weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
                 maximize=False,
             )
         case "SGD":
@@ -66,7 +73,7 @@ def calculate_val_loss(
                 lr=HYPERPARAMS["LEARNING_RATE"],
                 momentum=HYPERPARAMS["MOMENTUM"],
                 dampening=HYPERPARAMS["DAMPENING"],
-                # weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
+                weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
                 maximize=False,
             )
 
