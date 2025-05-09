@@ -1,34 +1,37 @@
-from models import get_resnet_18, calculate_val_loss
+from models import get_resnet_18, get_resnet_50, calculate_val_loss
 from dataset_utils import get_dataloader, all_datasets, split_df, split_domains
-from utils import get_expected_input, get_params_from_user
+from utils import (
+    get_expected_input,
+    get_params_from_user,
+    split_df_into_loaders,
+)
 
 model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
+if model_name == "ResNet18":
+    model = get_resnet_18()
+elif model_name == "ResNet50":
+    model = get_resnet_50()
 
 # TODO: ask the user for input when we obtain another dataset
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
+params = get_params_from_user()
 
-target_domain = get_expected_input(
-    "Please choose the target domain:", dataset["domains"]
+train_loader, test_loader, val_loader, target_domain = split_df_into_loaders(
+    dataset["df"]
 )
 
-params = get_params_from_user()
+
 print(
     f"\n\n\nTrain {model_name} model with target_domain = {target_domain} and Hyperparameters = {params}"
 )
 
-train_df, test_df = split_domains(dataset["df"], target_domain)
-
-
-# train_df, test_df = split_domains(DATAFRAME, TARGET_DOMAIN)
-train_df, test_df = split_df(all_datasets["pacs"]["df"], test_size=0.2)
-train_loader = get_dataloader(train_df, batch_size=params["BATCH_SIZE"])
-test_loader = get_dataloader(test_df, batch_size=params["BATCH_SIZE"])
-
-model = get_resnet_18()
-
 loss = calculate_val_loss(
-    train_loader=train_loader, test_loader=test_loader, model=model, HYPERPARAMS=params
+    train_loader=train_loader,
+    test_loader=test_loader,
+    val_loader=val_loader,
+    model=model,
+    HYPERPARAMS=params,
 )
 
 print("Final validation loss:", loss)

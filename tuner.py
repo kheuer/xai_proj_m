@@ -3,7 +3,7 @@
 import os
 from datetime import datetime
 import optuna
-from utils import get_expected_input
+from utils import get_expected_input, split_df_into_loaders
 from dataset_utils import split_domains, get_dataloader, split_df
 from models import (
     get_resnet_18,
@@ -11,7 +11,7 @@ from models import (
     all_datasets,
     calculate_val_loss,
 )
-from config import MAX_EPOCHS, PATIENCE
+from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE
 
 model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
 
@@ -19,20 +19,14 @@ model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 
-target_domain = get_expected_input(
-    "Please choose the target domain:", dataset["domains"]
-)
+# take a random sample to speed up training
+_, df_sampled = split_df(dataset["df"], test_size=0.2)
+
+train_loader, test_loader, val_loader, target_domain = split_df_into_loaders(df_sampled)
 
 STUDY_NAME = (
     f"STUDY_{model_name}_{target_domain}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 )
-
-train_df, test_df = split_domains(dataset["df"], target_domain)
-
-
-# take a random sample to speed up training
-_, train_df = split_df(train_df, test_size=0.2)
-_, test_df = split_df(test_df, test_size=0.4)
 
 
 def objective(trial):
@@ -55,7 +49,6 @@ def objective(trial):
             trial.suggest_categorical("BETA_2", [0.99, 0.999, 0.9999]),
         ),
         # "WEIGHT_DECAY": trial.suggest_float("WEIGHT_DECAY", 0.0, 0.1),
-        "BATCH_SIZE": trial.suggest_categorical("BATCH_SIZE", [16, 32, 64, 128, 256]),
         "OPTIMIZER": trial.suggest_categorical("OPTIMIZER", ["AdamW", "SGD"]),
         "SCHEDULER": trial.suggest_categorical(
             "SCHEDULER",
@@ -67,9 +60,6 @@ def objective(trial):
         "STEP_SIZE": trial.suggest_int("STEP_SIZE", 5, 50),
     }
 
-    train_loader = get_dataloader(train_df, batch_size=params["BATCH_SIZE"])
-    test_loader = get_dataloader(test_df, batch_size=params["BATCH_SIZE"])
-
     if model_name == "ResNet18":
         model = get_resnet_18(weights=None)
     else:
@@ -78,6 +68,7 @@ def objective(trial):
     loss = calculate_val_loss(
         train_loader=train_loader,
         test_loader=test_loader,
+        val_loader=val_loader,
         model=model,
         HYPERPARAMS=params,
     )

@@ -1,8 +1,10 @@
 from ast import literal_eval
-from typing import Union, List
+from typing import Union, List, Tuple
 import matplotlib.pyplot as plt
 import pandas as pd
-from config import MAX_EPOCHS, PATIENCE
+from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE
+from dataset_utils import get_dataloader, all_datasets, split_df, split_domains
+from torch.utils.data import DataLoader
 
 
 def show_tensor(tensor):
@@ -81,7 +83,7 @@ def get_expected_input(prompt: str, options: List[str]) -> str:
 
 def parse_params(data):
     try:
-        return literal_eval(data[data.index("{") :])
+        return literal_eval(data[data.index("{") :].strip())
     except SyntaxError:
         raise ValueError("The data contains no well formated key-value pair")
 
@@ -143,3 +145,21 @@ def get_params_from_user():
 
     except ValueError:
         raise ValueError("This dictionary is not well formated")
+
+
+# this has to be here to avoid circular imports
+def split_df_into_loaders(
+    df: pd.DataFrame,
+) -> Tuple[DataLoader, DataLoader, DataLoader, str]:
+    target_domain = get_expected_input(
+        "Please choose the target domain:", sorted(df["domain"].unique())
+    )
+
+    df_source, df_target = split_domains(df, target_domain)
+
+    train_loader = get_dataloader(df_source, batch_size=BATCH_SIZE)
+
+    test_df, val_df = split_df(df_target, test_size=0.4)
+    test_loader = get_dataloader(test_df, batch_size=BATCH_SIZE)
+    val_loader = get_dataloader(val_df, batch_size=BATCH_SIZE)
+    return train_loader, test_loader, val_loader, target_domain

@@ -14,9 +14,12 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from cuda import device
 
-random.seed(42)
-np.random.seed(42)
-torch.manual_seed(42)
+seed = random.randint(1, 100_000)
+print(f"RANDOM SEED: {seed}")
+
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
 
 transform_to_tensor = transforms.ToTensor()
 transform_to_pil = transforms.ToPILImage()

@@ -12,7 +12,7 @@ import numpy as np
 
 
 def get_resnet_18(
-    weights: Union[str, None] = "ResNet18_Weights.DEFAULT",
+    weights: Union[str, None] = None,
 ) -> torchvision.models.resnet18:
     resnet18 = torchvision.models.resnet18(weights=weights)
     resnet18.fc = nn.Linear(
@@ -24,7 +24,7 @@ def get_resnet_18(
 
 
 def get_resnet_50(
-    weights: Union[str, None] = "ResNet50_Weights.DEFAULT",
+    weights: Union[str, None] = None,
 ) -> torchvision.models.resnet50:
     resnet50 = torchvision.models.resnet50(weights=weights)
     resnet50.fc = nn.Linear(
@@ -46,6 +46,7 @@ class NoScheduler:
 def calculate_val_loss(
     train_loader: DataLoader,
     test_loader: DataLoader,
+    val_loader: DataLoader,
     model: torchvision.models,
     HYPERPARAMS: dict,
 ) -> float:
@@ -160,8 +161,12 @@ def calculate_val_loss(
                 break
 
     # Load the best model weights
-    # MODEL.load_state_dict(best_model_weights)
-    return best_loss
+    model.load_state_dict(best_model_weights)
+    return _do_eval(
+        model=model,
+        criterion=criterion,
+        test_loader=val_loader,
+    )
 
 
 def _do_train(
