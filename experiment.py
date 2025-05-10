@@ -17,7 +17,7 @@ dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 params = get_params_from_user()
 
-train_loader, test_loader, val_loader, target_domain = split_df_into_loaders(
+train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(
     dataset["df"]
 )
 
