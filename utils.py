@@ -16,15 +16,27 @@ def show_tensor(tensor):
     plt.show()
 
 
-def plot_loss(train_losses, val_losses):
+def plot_loss(train_losses, val_losses, test_losses):
     fig, ax = plt.subplots(1, 2, figsize=(15, 5))  # Create a 1x2 subplot
 
     # Standard Loss Plot
     ax[0].plot(
-        range(1, len(train_losses) + 1), train_losses, label="Training Loss", marker="o"
+        range(1, len(train_losses) + 1),
+        train_losses,
+        label=f"Training Loss (last={round(train_losses[-1], 2)})",
+        marker="o",
     )
     ax[0].plot(
-        range(1, len(val_losses) + 1), val_losses, label="Validation Loss", marker="o"
+        range(1, len(val_losses) + 1),
+        val_losses,
+        label=f"Validation Loss (last={round(val_losses[-1], 2)})",
+        marker="o",
+    )
+    ax[0].plot(
+        range(1, len(test_losses) + 1),
+        test_losses,
+        label=f"Test Loss (last={round(test_losses[-1], 2)})",
+        marker="o",
     )
     ax[0].set_title("Training and Validation Loss")
     ax[0].set_xlabel("Epochs")
@@ -34,10 +46,22 @@ def plot_loss(train_losses, val_losses):
 
     # Logarithmic Loss Plot
     ax[1].plot(
-        range(1, len(train_losses) + 1), train_losses, label="Training Loss", marker="o"
+        range(1, len(train_losses) + 1),
+        train_losses,
+        label=f"Training Loss (last={round(train_losses[-1], 2)})",
+        marker="o",
     )
     ax[1].plot(
-        range(1, len(val_losses) + 1), val_losses, label="Validation Loss", marker="o"
+        range(1, len(val_losses) + 1),
+        val_losses,
+        label=f"Validation Loss (last={round(val_losses[-1], 2)})",
+        marker="o",
+    )
+    ax[1].plot(
+        range(1, len(test_losses) + 1),
+        test_losses,
+        label=f"Test Loss (last={round(test_losses[-1], 2)})",
+        marker="o",
     )
     ax[1].set_title("Training and Validation Loss (Log Scale)")
     ax[1].set_xlabel("Epochs")
@@ -156,16 +180,17 @@ def split_df_into_loaders(
     )
 
     df_source, df_target = split_domains(df, target_domain)
-    train_df, source_domain_test_df = split_df(df_source, test_size=0.15)
+    train_df, source_domain_val_df = split_df(df_source, test_size=0.15)
 
     train_loader = get_dataloader(train_df, batch_size=BATCH_SIZE)
 
-    target_domain_test_df, val_df = split_df(df_target, test_size=0.4)
+    target_domain_val_df, test_df = split_df(df_target, test_size=0.4)
 
-    test_df = pd.concat((source_domain_test_df, target_domain_test_df)).reset_index(
+    val_df = pd.concat((source_domain_val_df, target_domain_val_df)).reset_index(
         drop=True
     )
+    val_df_shuffled = val_df.sample(frac=1).reset_index(drop=True)
 
+    val_loader = get_dataloader(val_df_shuffled, batch_size=BATCH_SIZE)
     test_loader = get_dataloader(test_df, batch_size=BATCH_SIZE)
-    val_loader = get_dataloader(val_df, batch_size=BATCH_SIZE)
-    return train_loader, test_loader, val_loader, target_domain
+    return train_loader, val_loader, test_loader, target_domain

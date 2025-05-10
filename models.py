@@ -13,7 +13,7 @@ from transformation_utils import transform_pipeline
 
 
 def get_resnet_18(
-    weights: Union[str, None] = None,
+    weights: Union[str, None] = "IMAGENET1K_V1",
 ) -> torchvision.models.resnet18:
     resnet18 = torchvision.models.resnet18(weights=weights)
     resnet18.fc = nn.Sequential(
@@ -28,7 +28,7 @@ def get_resnet_18(
 
 
 def get_resnet_50(
-    weights: Union[str, None] = None,
+    weights: Union[str, None] = "IMAGENET1K_V1",
 ) -> torchvision.models.resnet50:
     resnet50 = torchvision.models.resnet50(weights=weights)
     resnet50.fc = nn.Sequential(
@@ -124,6 +124,7 @@ def calculate_val_loss(
 
     train_losses = []
     val_losses = []
+    test_losses = []
 
     # Training Loop
     for epoch in range(HYPERPARAMS["EPOCHS"]):
@@ -134,7 +135,7 @@ def calculate_val_loss(
                 model=model,
                 criterion=criterion,
                 optimizer=optimizer,
-                train_loader=train_loader,
+                dataloader=train_loader,
             )
         )
 
@@ -143,7 +144,15 @@ def calculate_val_loss(
             _do_eval(
                 model=model,
                 criterion=criterion,
-                test_loader=test_loader,
+                dataloader=val_loader,
+            )
+        )
+
+        test_losses.append(
+            _do_eval(
+                model=model,
+                criterion=criterion,
+                dataloader=test_loader,
             )
         )
 
@@ -155,7 +164,7 @@ def calculate_val_loss(
 
         # clear cell in case this is run in a jupyter notebook
         clear_output(wait=True)
-        plot_loss(train_losses, val_losses)
+        plot_loss(train_losses, val_losses, test_losses)
 
         # Early Stopping Check
         if val_losses[-1] < best_loss:
@@ -168,23 +177,19 @@ def calculate_val_loss(
                 break
 
     # Load the best model weights
-    model.load_state_dict(best_model_weights)
-    return _do_eval(
-        model=model,
-        criterion=criterion,
-        test_loader=val_loader,
-    )
+    # model.load_state_dict(best_model_weights)
+    return test_losses[val_losses.index(best_loss)]
 
 
 def _do_train(
     model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
     optimizer: torch.optim,
-    train_loader: torch.utils.data.DataLoader,
+    dataloader: torch.utils.data.DataLoader,
 ) -> float:
     model.train(True)
     running_loss = 0.0
-    for features, labels in train_loader:
+    for features, labels in dataloader:
         optimizer.zero_grad()
         outputs = model(features)
 
@@ -194,20 +199,20 @@ def _do_train(
 
         running_loss += loss.item()
 
-    return running_loss / len(train_loader)
+    return running_loss / len(dataloader)
 
 
 def _do_eval(
     model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
-    test_loader: torch.utils.data.DataLoader,
+    dataloader: torch.utils.data.DataLoader,
 ) -> float:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
     with torch.no_grad():
-        for features, labels in test_loader:
+        for features, labels in dataloader:
             outputs = model(features)
             loss = criterion(outputs, labels)
             validation_loss += loss.item()
 
-    return validation_loss / len(test_loader)
+    return validation_loss / len(dataloader)

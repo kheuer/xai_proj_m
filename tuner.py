@@ -22,7 +22,7 @@ dataset = all_datasets[dataset_name]
 # take a random sample to speed up training
 _, df_sampled = split_df(dataset["df"], test_size=0.2)
 
-train_loader, test_loader, val_loader, target_domain = split_df_into_loaders(df_sampled)
+train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled)
 
 STUDY_NAME = (
     f"STUDY_{model_name}_{target_domain}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
