@@ -13,7 +13,7 @@ from transformation_utils import transform_pipeline
 
 
 def get_resnet_18(
-    weights: Union[str, None] = None,
+    weights: Union[str, None] = "IMAGENET1K_V1",
 ) -> torchvision.models.resnet18:
     resnet18 = torchvision.models.resnet18(weights=weights)
     resnet18.fc = nn.Sequential(
@@ -28,7 +28,7 @@ def get_resnet_18(
 
 
 def get_resnet_50(
-    weights: Union[str, None] = None,
+    weights: Union[str, None] = "IMAGENET1K_V1",
 ) -> torchvision.models.resnet50:
     resnet50 = torchvision.models.resnet50(weights=weights)
     resnet50.fc = nn.Sequential(

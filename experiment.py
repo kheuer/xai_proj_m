@@ -1,3 +1,4 @@
+import numpy as np
 from models import get_resnet_18, get_resnet_50, calculate_val_loss
 from dataset_utils import get_dataloader, all_datasets, split_df, split_domains
 from utils import (
@@ -26,12 +27,18 @@ print(
     f"\n\n\nTrain {model_name} model with target_domain = {target_domain} and Hyperparameters = {params}"
 )
 
-loss = calculate_val_loss(
-    train_loader=train_loader,
-    test_loader=test_loader,
-    val_loader=val_loader,
-    model=model,
-    HYPERPARAMS=params,
-)
+losses = []
+while True:
+    losses.append(
+        calculate_val_loss(
+            train_loader=train_loader,
+            test_loader=test_loader,
+            val_loader=val_loader,
+            model=model,
+            HYPERPARAMS=params,
+        )
+    )
 
-print("Final validation loss:", loss)
+    print(
+        f"Average test loss: {np.mean(losses)}\nNumber of runs: {len(losses)}\nAll test loss results: {losses}"
+    )
