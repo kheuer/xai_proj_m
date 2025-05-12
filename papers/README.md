@@ -67,13 +67,17 @@
   _Citations: 23,663_
 - 
   - code available on [GitHub](https://github.com/google-research/simclr)
-- [Image Augmentation is All You Need: Regularizing Deep Reinforcement Learning from Pixels (2021)](https://openreview.net/pdf?id=GY6-6sTvGaf)  
+- [~~Image Augmentation is All You Need: Regularizing Deep Reinforcement Learning from Pixels (2021)~~](https://openreview.net/pdf?id=GY6-6sTvGaf)  
   _Citations: 525_
 
 ### 🧩 Self-Supervised Learning-Based
 - [Domain Generalization by Solving Jigsaw Puzzles (CVPR 2019)](https://openaccess.thecvf.com/content_CVPR_2019/papers/Carlucci_Domain_Generalization_by_Solving_Jigsaw_Puzzles_CVPR_2019_paper.pdf)  
-  _Citations: 1,068_
+  _Citations: 1,068_ 
+  - can be applied to resnet(they did it in the paper)
+  - Code available on [GitHub](https://github.com/fmcarlucci/JigenDG)
+
 
 ### 🧬 Mixup-Based
 - [AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty (2019)](https://arxiv.org/pdf/1912.02781)  
-  _Citations: 1,584_
+  _Citations: 1,584_ 
+  - Code available on [GitHub](https://github.com/google-research/augmix)
