@@ -8,10 +8,6 @@ from utils import (
 )
 
 model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
-if model_name == "ResNet18":
-    model = get_resnet_18()
-elif model_name == "ResNet50":
-    model = get_resnet_50()
 
 # TODO: ask the user for input when we obtain another dataset
 dataset_name = "pacs"
@@ -29,6 +25,10 @@ print(
 
 losses = []
 while True:
+    if model_name == "ResNet18":
+        model = get_resnet_18()
+    elif model_name == "ResNet50":
+        model = get_resnet_50()
     losses.append(
         calculate_val_loss(
             train_loader=train_loader,
