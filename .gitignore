@@ -180,3 +180,4 @@ pacs-dataset/*
 results/*
 *.png
 runs/*
+output_images
