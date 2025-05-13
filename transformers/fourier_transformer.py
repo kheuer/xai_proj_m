@@ -2,7 +2,7 @@ import torch
 from torch.fft import fft2, ifft2, fftshift, ifftshift
 
 class FourierTransformer(object):
-    def __init__(self, square_size=None, img_size=227, eta=None):
+    def __init__(self, square_size=None, eta=None):
         """
                Initializes the FourierTransformer.
 
@@ -33,9 +33,6 @@ class FourierTransformer(object):
 
         if square_size is not None and eta is None:
             self.square_size = square_size
-            center = img_size // 2
-            self.square_start = center - (square_size // 2)
-            self.square_stop = center + (square_size // 2)
             self.augmentation_type = 0
 
         elif square_size is None and eta is not None:
@@ -44,9 +41,6 @@ class FourierTransformer(object):
 
         elif square_size is not None and eta is not None:
             self.square_size = square_size
-            center = img_size // 2
-            self.square_start = center - (square_size // 2)
-            self.square_stop = center + (square_size // 2)
             self.eta = eta
             self.augmentation_type = 2
 
