@@ -14,7 +14,7 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from cuda import device
 
-seed = random.randint(1, 100_000)
+seed = 42  # random.randint(1, 100_000)
 print(f"RANDOM SEED: {seed}")
 
 random.seed(seed)

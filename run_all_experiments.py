@@ -1,15 +1,10 @@
 import os
-import numpy as np
 from tqdm import tqdm
 from itertools import product
 from torch import save
 from models import get_resnet_18, get_resnet_50, calculate_val_loss
-from dataset_utils import get_dataloader, all_datasets, split_df, split_domains, seed
-from utils import (
-    get_expected_input,
-    get_params_from_user,
-    split_df_into_loaders,
-)
+from dataset_utils import all_datasets, seed
+from utils import split_df_into_loaders
 
 
 filename = "final_results.txt"
@@ -20,7 +15,6 @@ if os.path.exists(filename):
     ).lower()
     if response == "y":
         os.remove(filename)
-        print(f"File '{filename}' has been deleted.")
     else:
         print("File was not deleted. Exiting.")
         exit()
@@ -77,7 +71,7 @@ for model_name, pretrained, target_domain in tqdm(
             return_best_weights=True,
         )
         losses.append(loss)
-        if loss[-1] == min(losses):
+        if losses[-1] == min(losses):
             save(weights, f"weights/{model_name}_{target_domain}_{pretrained}.pth")
 
     msg = f"{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}: {losses}"
