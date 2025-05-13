@@ -38,10 +38,10 @@
   _Citations: 1,159_
 
 ### ⚔️ Adversarial Training-Based
-- [Cross-Gradient Training for Generalizing Across Domains (2018)](https://arxiv.org/pdf/1804.10745)  
+- [~~Cross-Gradient Training for Generalizing Across Domains (2018)~~](https://arxiv.org/pdf/1804.10745)  
   _Citations: 641_
   - Experiments on character recognition (font = domain)
-- [Generalizing to Unseen Domains via Adversarial Data Augmentation (NeurIPS 2018)](https://proceedings.neurips.cc/paper/2018/file/1d94108e907bb8311d8802b48fd54b4a-Paper.pdf)  
+- [~~Generalizing to Unseen Domains via Adversarial Data Augmentation (NeurIPS 2018)~~](https://proceedings.neurips.cc/paper/2018/file/1d94108e907bb8311d8802b48fd54b4a-Paper.pdf)  
   _Citations: 969_
   - transform a image to a fictive distribution
   - could be applied but looks complicated
