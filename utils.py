@@ -173,11 +173,12 @@ def get_params_from_user():
 
 # this has to be here to avoid circular imports
 def split_df_into_loaders(
-    df: pd.DataFrame,
+    df: pd.DataFrame, target_domain: Union[str, None] = None
 ) -> Tuple[DataLoader, DataLoader, DataLoader, str]:
-    target_domain = get_expected_input(
-        "Please choose the target domain:", sorted(df["domain"].unique())
-    )
+    if target_domain is None:
+        target_domain = get_expected_input(
+            "Please choose the target domain:", sorted(df["domain"].unique())
+        )
 
     df_source, df_target = split_domains(df, target_domain)
     train_df, source_domain_val_df = split_df(df_source, test_size=0.15)

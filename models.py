@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Tuple
 from IPython.display import clear_output
 import torch
 from torch import nn
@@ -55,7 +55,8 @@ def calculate_val_loss(
     val_loader: DataLoader,
     model: torchvision.models,
     HYPERPARAMS: dict,
-) -> float:
+    return_best_weights: bool = False,
+) -> Union[float, Tuple[float, torch.Tensor]]:
 
     match HYPERPARAMS["OPTIMIZER"]:
         case "AdamW":
@@ -177,7 +178,12 @@ def calculate_val_loss(
 
     # Load the best model weights
     # model.load_state_dict(best_model_weights)
-    return test_losses[val_losses.index(best_loss)]
+    test_loss = test_losses[val_losses.index(best_loss)]
+
+    if return_best_weights:
+        return test_loss, best_model_weights
+    else:
+        return test_loss
 
 
 def _do_train(
