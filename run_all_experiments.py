@@ -1,7 +1,9 @@
 import os
+import gc
 from tqdm import tqdm
 from itertools import product
 from torch import save
+from torch.cuda import empty_cache
 from models import get_resnet_18, get_resnet_50, calculate_val_loss
 from dataset_utils import all_datasets, seed
 from utils import split_df_into_loaders
@@ -18,6 +20,9 @@ if os.path.exists(filename):
     else:
         print("File was not deleted. Exiting.")
         exit()
+
+if not os.path.isdir("weights"):
+    os.makedirs("weights")
 
 
 with open(filename, "w") as f:
@@ -51,7 +56,7 @@ for model_name, pretrained, target_domain in tqdm(
     total=len(model_names) * len(pretrained_options) * len(target_domains),
     desc="Running combinations",
 ):
-    train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(
+    train_loader, val_loader, test_loader, _ = split_df_into_loaders(
         df=dataset["df"], target_domain=target_domain
     )
 
@@ -74,7 +79,17 @@ for model_name, pretrained, target_domain in tqdm(
         if losses[-1] == min(losses):
             save(weights, f"weights/{model_name}_{target_domain}_{pretrained}.pth")
 
-    msg = f"{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}: {losses}"
+    # manual garbage collection to avoid cuda OOM errors
+    del weights
+    del train_loader
+    del val_loader
+    del test_loader
+    model.to("cpu")
+    del model
+    gc.collect()
+    empty_cache()
+
+    msg = f"\n{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}: {losses}"
     # print(msg)
-    with open(filename, "w") as f:
+    with open(filename, "a") as f:
         f.write(msg)
