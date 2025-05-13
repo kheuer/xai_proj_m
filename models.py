@@ -9,13 +9,12 @@ from utils import plot_loss
 from sklearn.utils.class_weight import compute_class_weight
 from torch.utils.data import DataLoader
 import numpy as np
-from transformation_utils import transform_pipeline
 
 
-def get_resnet_18(
-    weights: Union[str, None] = "IMAGENET1K_V1",
-) -> torchvision.models.resnet18:
-    resnet18 = torchvision.models.resnet18(weights=weights)
+def get_resnet_18(pretrained: bool) -> torchvision.models.resnet18:
+    resnet18 = torchvision.models.resnet18(
+        weights="IMAGENET1K_V1" if pretrained else None
+    )
     resnet18.fc = nn.Sequential(
         nn.Dropout(0.5),
         nn.Linear(
@@ -27,10 +26,10 @@ def get_resnet_18(
     return resnet18
 
 
-def get_resnet_50(
-    weights: Union[str, None] = "IMAGENET1K_V1",
-) -> torchvision.models.resnet50:
-    resnet50 = torchvision.models.resnet50(weights=weights)
+def get_resnet_50(pretrained: bool) -> torchvision.models.resnet50:
+    resnet50 = torchvision.models.resnet50(
+        weights="IMAGENET1K_V1" if pretrained else None
+    )
     resnet50.fc = nn.Sequential(
         nn.Dropout(0.5),
         nn.Linear(

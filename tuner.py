@@ -14,6 +14,9 @@ from models import (
 from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE
 
 model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
+pretrained = {"Yes": True, "No": False}[
+    get_expected_input("Use pre-trained weights? ", ("Yes", "No"))
+]
 
 # TODO: ask the user for input when we obtain another dataset
 dataset_name = "pacs"
@@ -24,9 +27,7 @@ _, df_sampled = split_df(dataset["df"], test_size=0.2)
 
 train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled)
 
-STUDY_NAME = (
-    f"STUDY_{model_name}_{target_domain}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
-)
+STUDY_NAME = f"STUDY_{model_name}_{target_domain}_{pretrained}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 
 
 def objective(trial):
@@ -61,9 +62,9 @@ def objective(trial):
     }
 
     if model_name == "ResNet18":
-        model = get_resnet_18(weights=None)
+        model = get_resnet_18(pretrained=pretrained)
     else:
-        model = get_resnet_50(weights=None)
+        model = get_resnet_50(pretrained=pretrained)
 
     loss = calculate_val_loss(
         train_loader=train_loader,
