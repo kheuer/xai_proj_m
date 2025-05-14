@@ -1,3 +1,4 @@
+import copy
 from typing import Union, Tuple
 from IPython.display import clear_output
 import torch
@@ -47,6 +48,14 @@ class NoScheduler:
 
     def step(self):
         pass
+
+
+def get_criterion(train_loader: DataLoader) -> nn.CrossEntropyLoss:
+    # create the loss function and correct for inballances in the training dataset by using weights
+    y = train_loader.dataset.tensors[1].cpu().tolist()
+    weights = compute_class_weight(class_weight="balanced", classes=np.unique(y), y=y)
+    weights = torch.Tensor(weights).to(device)
+    return nn.CrossEntropyLoss(weight=weights)
 
 
 def calculate_val_loss(
@@ -111,12 +120,7 @@ def calculate_val_loss(
         case "None":
             scheduler = NoScheduler()
 
-    # create the loss function and correct for inballances in the training dataset by using weights
-    y = train_loader.dataset.tensors[1].cpu().tolist()
-    weights = compute_class_weight(class_weight="balanced", classes=np.unique(y), y=y)
-    weights = torch.Tensor(weights).to(device)
-
-    criterion = nn.CrossEntropyLoss(weight=weights)
+    criterion = get_criterion(train_loader)
 
     best_loss = float("inf")
     epochs_without_improvement = 0
@@ -170,7 +174,8 @@ def calculate_val_loss(
         if val_losses[-1] < best_loss:
             best_loss = val_losses[-1]
             epochs_without_improvement = 0
-            best_model_weights = model.state_dict().copy()  # Save the best model
+            # Save the best model
+            best_model_weights = copy.deepcopy(model.state_dict())
         else:
             epochs_without_improvement += 1
             if epochs_without_improvement >= HYPERPARAMS["PATIENCE"]:
