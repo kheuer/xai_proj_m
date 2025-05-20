@@ -181,3 +181,7 @@ results/*
 *.png
 runs/*
 output_images
+*.pth
+*.tar.gz
+final_results.txt
+*.csv
