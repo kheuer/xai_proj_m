@@ -172,6 +172,7 @@ def get_params_from_user():
 
 
 # this has to be here to avoid circular imports
+# TODO: fix this
 def split_df_into_loaders(
     df: pd.DataFrame, target_domain: Union[str, None] = None
 ) -> Tuple[DataLoader, DataLoader, DataLoader, str]:
@@ -181,17 +182,11 @@ def split_df_into_loaders(
         )
 
     df_source, df_target = split_domains(df, target_domain)
-    train_df, source_domain_val_df = split_df(df_source, test_size=0.15)
+
+    train_df, val_df = split_df(df_source, test_size=0.15)
+    test_df = df_target
 
     train_loader = get_dataloader(train_df, batch_size=BATCH_SIZE)
-
-    target_domain_val_df, test_df = split_df(df_target, test_size=0.4)
-
-    val_df = pd.concat((source_domain_val_df, target_domain_val_df)).reset_index(
-        drop=True
-    )
-    val_df_shuffled = val_df.sample(frac=1).reset_index(drop=True)
-
-    val_loader = get_dataloader(val_df_shuffled, batch_size=BATCH_SIZE)
+    val_loader = get_dataloader(val_df, batch_size=BATCH_SIZE)
     test_loader = get_dataloader(test_df, batch_size=BATCH_SIZE)
     return train_loader, val_loader, test_loader, target_domain
