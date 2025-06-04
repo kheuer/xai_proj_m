@@ -3,3 +3,4 @@ Pillow
 tensorboard
 optuna
 torchvision
+matplotlib

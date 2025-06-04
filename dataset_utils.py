@@ -72,6 +72,7 @@ all_datasets = {
         "df": pacs_df,
         "classes": pacs_classes,
         "domains": list(pacs_df["domain"].unique()),
+        "shape": (3, 227, 227),
     }
 }
 

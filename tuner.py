@@ -30,7 +30,7 @@ train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_
 STUDY_NAME = f"STUDY_{model_name}_{target_domain}_{pretrained}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 
 
-def objective(trial):
+def objective(trial: optuna.trial.Trial):
     """
     Objective function for Optuna to optimize hyperparameters.
 
