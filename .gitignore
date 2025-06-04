@@ -185,3 +185,4 @@ output_images
 *.tar.gz
 final_results.txt
 *.csv
+*.ipynb

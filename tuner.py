@@ -3,6 +3,7 @@
 import os
 from datetime import datetime
 import optuna
+from torchvision.transforms import InterpolationMode
 from utils import get_expected_input, split_df_into_loaders
 from dataset_utils import split_domains, get_dataloader, split_df
 from models import (
@@ -22,25 +23,19 @@ pretrained = {"Yes": True, "No": False}[
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 
+transformations = {"Yes": True, "No": False}[
+    get_expected_input("Apply transformations during training? ", ("Yes", "No"))
+]
+
 # take a random sample to speed up training
 _, df_sampled = split_df(dataset["df"], test_size=0.2)
 
 train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled)
 
-STUDY_NAME = f"STUDY_{model_name}_{target_domain}_{pretrained}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
+STUDY_NAME = f"STUDY_{model_name}_{target_domain}_pretrained_{pretrained}_transformations_{transformations}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 
 
-def objective(trial: optuna.trial.Trial):
-    """
-    Objective function for Optuna to optimize hyperparameters.
-
-    Args:
-    - trial: optuna.trial.Trial object
-
-    Returns:
-    - Loss value to minimize
-    """
-
+def objective_simple(trial: optuna.trial.Trial):
     params = {
         "EPOCHS": MAX_EPOCHS,
         "PATIENCE": PATIENCE,
@@ -59,6 +54,84 @@ def objective(trial: optuna.trial.Trial):
         "DAMPENING": trial.suggest_float("DAMPENING", 0, 0.2),
         "GAMMA": trial.suggest_float("GAMMA", 0.1, 0.9),
         "STEP_SIZE": trial.suggest_int("STEP_SIZE", 5, 50),
+        # disable tranformations
+        "USE_AUGMIX": False,
+        "USE_FOURIER": False,
+        "USE_JIGSAW": False,
+        "USE_DLOW": False,
+    }
+
+    if model_name == "ResNet18":
+        model = get_resnet_18(pretrained=pretrained)
+    else:
+        model = get_resnet_50(pretrained=pretrained)
+
+    loss = calculate_val_loss(
+        train_loader=train_loader,
+        test_loader=test_loader,
+        val_loader=val_loader,
+        model=model,
+        HYPERPARAMS=params,
+    )
+
+    return loss
+
+
+def objective_transformations(trial: optuna.trial.Trial):
+    params = {
+        # LEARNING PARAMS
+        "EPOCHS": MAX_EPOCHS,
+        "PATIENCE": PATIENCE,
+        "LEARNING_RATE": trial.suggest_float("LEARNING_RATE", 0.000001, 0.01),
+        "BETAS": (
+            trial.suggest_categorical("BETA_1", [0.8, 0.9, 0.95]),
+            trial.suggest_categorical("BETA_2", [0.99, 0.999, 0.9999]),
+        ),
+        "WEIGHT_DECAY": trial.suggest_float("WEIGHT_DECAY", 0.0, 0.1),
+        "OPTIMIZER": trial.suggest_categorical("OPTIMIZER", ["AdamW", "SGD"]),
+        "SCHEDULER": trial.suggest_categorical(
+            "SCHEDULER",
+            ["CosineAnnealingLR", "ReduceLROnPlateau", "LinearLR", "StepLR", "None"],
+        ),
+        "MOMENTUM": trial.suggest_float("MOMENTUM", 0.5, 0.9),
+        "DAMPENING": trial.suggest_float("DAMPENING", 0, 0.2),
+        "GAMMA": trial.suggest_float("GAMMA", 0.1, 0.9),
+        "STEP_SIZE": trial.suggest_int("STEP_SIZE", 5, 50),
+        # TRANSFORMATION PARAMS
+        # Augmix params
+        "USE_AUGMIX": trial.suggest_boolean("USE_AUGMIX"),
+        "SEVERITY": trial.suggest_int("SEVERITY", 1, 10),
+        "MIXTURE_WIDTH": trial.suggest_int("MIXTURE_WIDTH", 1, 10),
+        "CHAIN_DEPTH": trial.suggest_int("CHAIN_DEPTH", 1, 10),
+        "ALPHA": trial.suggest_float("ALPHA", 0.0, 1.0),
+        "ALL_OPS": trial.suggest_boolean("ALL_OPS"),
+        "INTERPOLATION": trial.suggest_categorical(
+            [InterpolationMode.NEAREST, InterpolationMode.BILINEAR]
+        ),
+        # Fourier params
+        "USE_FOURIER": trial.suggest_boolean("USE_FOURIER"),
+        "SQUARE_SIZE": trial.suggest_int(
+            "SQUARE_SIZE_SINGLE_SIDE", 2, dataset["shape"][-1]
+        ),
+        "ETA": trial.suggest_float("ETA", 0, 1),
+        # Jigsaw params
+        "USE_JIGSAW": trial.suggest_boolean("USE_JIGSAW"),
+        "MIN_GRID_SIZE": trial.suggest_int("MIN_GRID_SIZE", 2, 6),
+        "MAX_GRID_SIZE": trial.suggest_int("MAX_GRID_SIZE", 6, 15),
+        # Dlow params
+        "USE_DLOW": False,
+        # Order params
+        "TRANSFORMATIONS_ORDER": trial.suggest_categorical(
+            "TRANSFORMATIONS_ORDER",
+            [
+                ("Augmix", "Dlow", "Fourier", "Jigsaw"),
+                ("Augmix", "Fourier", "Dlow", "Jigsaw"),
+                ("Fourier", "Augmix", "Dlow", "Jigsaw"),
+                ("Fourier", "Dlow", "Augmix", "Jigsaw"),
+                ("Dlow", "Augmix", "Fourier", "Jigsaw"),
+                ("Dlow", "Fourier", "Augmix", "Jigsaw"),
+            ],
+        ),
     }
 
     if model_name == "ResNet18":
@@ -113,6 +186,11 @@ if __name__ == "__main__":
         pruner=optuna.pruners.MedianPruner(),
         study_name=STUDY_NAME,
     )
+
+    objective = {True: objective_transformations, False: objective_simple}[
+        transformations
+    ]
+
     study.optimize(
         objective, gc_after_trial=True, callbacks=[print_callback, write_callback]
     )

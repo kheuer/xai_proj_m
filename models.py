@@ -10,6 +10,7 @@ from utils import plot_loss
 from sklearn.utils.class_weight import compute_class_weight
 from torch.utils.data import DataLoader
 import numpy as np
+from transformers.transformation_utils import get_transform_pipeline
 
 
 def get_resnet_18(pretrained: bool) -> torchvision.models.resnet18:
@@ -120,6 +121,8 @@ def calculate_val_loss(
         case "None":
             scheduler = NoScheduler()
 
+    transformation_pipeline = get_transform_pipeline(params=HYPERPARAMS)
+
     criterion = get_criterion(train_loader)
 
     best_loss = float("inf")
@@ -140,6 +143,7 @@ def calculate_val_loss(
                 criterion=criterion,
                 optimizer=optimizer,
                 dataloader=train_loader,
+                transformation_pipeline=transformation_pipeline,
             )
         )
 
@@ -149,6 +153,7 @@ def calculate_val_loss(
                 model=model,
                 criterion=criterion,
                 dataloader=val_loader,
+                transformation_pipeline=transformation_pipeline,
             )
         )
 
@@ -157,6 +162,7 @@ def calculate_val_loss(
                 model=model,
                 criterion=criterion,
                 dataloader=test_loader,
+                transformation_pipeline=transformation_pipeline,
             )
         )
 
@@ -196,12 +202,17 @@ def _do_train(
     criterion: torch.nn.CrossEntropyLoss,
     optimizer: torch.optim,
     dataloader: torch.utils.data.DataLoader,
+    transformation_pipeline: function,
 ) -> float:
     model.train(True)
     running_loss = 0.0
     for features, labels in dataloader:
         optimizer.zero_grad()
-        outputs = model(features)
+
+        features_transformed = transformation_pipeline(
+            features
+        )  # the transformation makes no changes if specified such
+        outputs = model(features_transformed)
 
         loss = criterion(outputs, labels)
         loss.backward()
@@ -216,12 +227,16 @@ def _do_eval(
     model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
     dataloader: torch.utils.data.DataLoader,
+    transformation_pipeline: function,
 ) -> float:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
     with torch.no_grad():
         for features, labels in dataloader:
-            outputs = model(features)
+            features_transformed = transformation_pipeline(
+                features
+            )  # the transformation makes no changes if specified such
+            outputs = model(features_transformed)
             loss = criterion(outputs, labels)
             validation_loss += loss.item()
 
