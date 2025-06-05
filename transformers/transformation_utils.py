@@ -1,3 +1,4 @@
+from typing import Callable, Union, List
 from functools import reduce
 import optuna
 from torchvision import transforms
@@ -7,7 +8,7 @@ from transformers.jigsaw_transformer import JigsawTransform
 from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 
 
-def get_transform_pipeline(params: dict) -> function:
+def get_transform_pipeline(params: dict) -> Callable:
     transformations = []
     for fn in params["TRANSFORMATIONS_ORDER"]:
         if fn == "Augmix" and params["USE_AUGMIX"]:

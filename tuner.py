@@ -99,23 +99,23 @@ def objective_transformations(trial: optuna.trial.Trial):
         "STEP_SIZE": trial.suggest_int("STEP_SIZE", 5, 50),
         # TRANSFORMATION PARAMS
         # Augmix params
-        "USE_AUGMIX": trial.suggest_boolean("USE_AUGMIX"),
+        "USE_AUGMIX": trial.suggest_categorical("USE_AUGMIX", [True, False]),
         "SEVERITY": trial.suggest_int("SEVERITY", 1, 10),
         "MIXTURE_WIDTH": trial.suggest_int("MIXTURE_WIDTH", 1, 10),
         "CHAIN_DEPTH": trial.suggest_int("CHAIN_DEPTH", 1, 10),
         "ALPHA": trial.suggest_float("ALPHA", 0.0, 1.0),
-        "ALL_OPS": trial.suggest_boolean("ALL_OPS"),
+        "ALL_OPS": trial.suggest_categorical("ALL_OPS", [True, False]),
         "INTERPOLATION": trial.suggest_categorical(
-            [InterpolationMode.NEAREST, InterpolationMode.BILINEAR]
+            "INTERPOLATION", [InterpolationMode.NEAREST, InterpolationMode.BILINEAR]
         ),
         # Fourier params
-        "USE_FOURIER": trial.suggest_boolean("USE_FOURIER"),
+        "USE_FOURIER": trial.suggest_categorical("USE_FOURIER", [True, False]),
         "SQUARE_SIZE": trial.suggest_int(
             "SQUARE_SIZE_SINGLE_SIDE", 2, dataset["shape"][-1]
         ),
         "ETA": trial.suggest_float("ETA", 0, 1),
         # Jigsaw params
-        "USE_JIGSAW": trial.suggest_boolean("USE_JIGSAW"),
+        "USE_JIGSAW": trial.suggest_categorical("USE_JIGSAW", [True, False]),
         "MIN_GRID_SIZE": trial.suggest_int("MIN_GRID_SIZE", 2, 6),
         "MAX_GRID_SIZE": trial.suggest_int("MAX_GRID_SIZE", 6, 15),
         # Dlow params

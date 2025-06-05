@@ -41,6 +41,8 @@ params = {
     "MOMENTUM": 0.53,
     "DAMPENING": 0.0145,
     "WEIGHT_DECAY": 0.0,
+    # augmentation params
+    "TRANSFORMATIONS_ORDER": [],
 }
 
 dataset_name = "pacs"
@@ -93,3 +95,6 @@ for model_name, pretrained, target_domain in tqdm(
     # print(msg)
     with open(filename, "a") as f:
         f.write(msg)
+
+# create the csv file with results
+import validate_results

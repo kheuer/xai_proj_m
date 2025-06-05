@@ -1,5 +1,5 @@
 import copy
-from typing import Union, Tuple
+from typing import Union, Tuple, Callable
 from IPython.display import clear_output
 import torch
 from torch import nn
@@ -202,7 +202,7 @@ def _do_train(
     criterion: torch.nn.CrossEntropyLoss,
     optimizer: torch.optim,
     dataloader: torch.utils.data.DataLoader,
-    transformation_pipeline: function,
+    transformation_pipeline: Callable,
 ) -> float:
     model.train(True)
     running_loss = 0.0
@@ -227,7 +227,7 @@ def _do_eval(
     model: torchvision.models,
     criterion: torch.nn.CrossEntropyLoss,
     dataloader: torch.utils.data.DataLoader,
-    transformation_pipeline: function,
+    transformation_pipeline: Callable,
 ) -> float:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
