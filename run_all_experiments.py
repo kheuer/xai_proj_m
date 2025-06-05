@@ -44,6 +44,7 @@ params = {
     # augmentation params
     "TRANSFORMATIONS_ORDER": [],
 }
+augmented = bool(params["TRANSFORMATIONS_ORDER"])
 
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
@@ -79,7 +80,10 @@ for model_name, pretrained, target_domain in tqdm(
         )
         losses.append(loss)
         if losses[-1] == min(losses):
-            save(weights, f"weights/{model_name}_{target_domain}_{pretrained}.pth")
+            save(
+                weights,
+                f"weights/{model_name}_{target_domain}_{pretrained}_{augmented}.pth",
+            )
 
     # manual garbage collection to avoid cuda OOM errors
     del weights
@@ -91,7 +95,7 @@ for model_name, pretrained, target_domain in tqdm(
     gc.collect()
     empty_cache()
 
-    msg = f"\n{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}: {losses}"
+    msg = f"\n{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}, augmented = {augmented}: {losses}"
     # print(msg)
     with open(filename, "a") as f:
         f.write(msg)
