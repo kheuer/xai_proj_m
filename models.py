@@ -154,7 +154,7 @@ def calculate_val_loss(
                 criterion=criterion,
                 dataloader=val_loader,
                 transformation_pipeline=transformation_pipeline,
-            )
+            )[0]
         )
 
         test_losses.append(
@@ -163,7 +163,7 @@ def calculate_val_loss(
                 criterion=criterion,
                 dataloader=test_loader,
                 transformation_pipeline=transformation_pipeline,
-            )
+            )[0]
         )
 
         match HYPERPARAMS["SCHEDULER"]:
@@ -228,9 +228,12 @@ def _do_eval(
     criterion: torch.nn.CrossEntropyLoss,
     dataloader: torch.utils.data.DataLoader,
     transformation_pipeline: Callable,
-) -> float:
+) -> tuple[float, float]:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
+    correct = 0
+    total = 0
+
     with torch.no_grad():
         for features, labels in dataloader:
             features_transformed = transformation_pipeline(
@@ -240,4 +243,11 @@ def _do_eval(
             loss = criterion(outputs, labels)
             validation_loss += loss.item()
 
-    return validation_loss / len(dataloader)
+            # Calculate predictions and compare to labels
+            _, predicted = torch.max(outputs, 1)
+            correct += (predicted == labels).sum().item()
+            total += labels.size(0)
+
+    avg_loss = validation_loss / len(dataloader)
+    accuracy = correct / total if total > 0 else 0.0
+    return avg_loss, accuracy
