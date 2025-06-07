@@ -13,7 +13,43 @@ to setup a conda environment
 - copy pacs dataset into 
 
 ```
-datasets/pacs
+dlow/datasets/pacs
+```
+```
+datasets
+├── pacs
+│   ├── art_painting
+│   │   ├── dog
+│   │   ├── elephant
+│   │   ├── giraffe
+│   │   ├── guitar
+│   │   ├── horse
+│   │   ├── house
+│   │   └── person
+│   ├── cartoon
+│   │   ├── dog
+│   │   ├── elephant
+│   │   ├── giraffe
+│   │   ├── guitar
+│   │   ├── horse
+│   │   ├── house
+│   │   └── person
+│   ├── photo
+│   │   ├── dog
+│   │   ├── elephant
+│   │   ├── giraffe
+│   │   ├── guitar
+│   │   ├── horse
+│   │   ├── house
+│   │   └── person
+│   └── sketch
+│       ├── dog
+│       ├── elephant
+│       ├── giraffe
+│       ├── guitar
+│       ├── horse
+│       ├── house
+│       └── person
 ```
 
 
