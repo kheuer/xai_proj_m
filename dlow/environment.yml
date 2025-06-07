@@ -1,0 +1,17 @@
+name: dlow
+channels:
+- peterjc123
+- defaults
+dependencies:
+- python=3.10.12
+- pytorch
+- scipy
+- pip
+- pip:
+  - dominate
+  - Pillow
+  - numpy
+  - psutils
+  - dotenv
+  - requests
+  - torchvision

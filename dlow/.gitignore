@@ -1,0 +1,6 @@
+*.pth
+checkpoints
+*/__pycache__
+.env
+datasets
+output.log
