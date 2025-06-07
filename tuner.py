@@ -55,6 +55,7 @@ def objective_simple(trial: optuna.trial.Trial):
         "GAMMA": trial.suggest_float("GAMMA", 0.1, 0.9),
         "STEP_SIZE": trial.suggest_int("STEP_SIZE", 5, 50),
         # disable tranformations
+        "TRANSFORMATIONS_ORDER": [],
         "USE_AUGMIX": False,
         "USE_FOURIER": False,
         "USE_JIGSAW": False,
