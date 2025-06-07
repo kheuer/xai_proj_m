@@ -172,7 +172,6 @@ def get_params_from_user():
 
 
 # this has to be here to avoid circular imports
-# TODO: fix this
 def split_df_into_loaders(
     df: pd.DataFrame, target_domain: Union[str, None] = None
 ) -> Tuple[DataLoader, DataLoader, DataLoader, str]:
@@ -189,4 +188,29 @@ def split_df_into_loaders(
     train_loader = get_dataloader(train_df, batch_size=BATCH_SIZE)
     val_loader = get_dataloader(val_df, batch_size=BATCH_SIZE)
     test_loader = get_dataloader(test_df, batch_size=BATCH_SIZE)
+    return train_loader, val_loader, test_loader, target_domain
+
+
+def split_df_into_loaders_val_alt_domain(
+    df: pd.DataFrame, target_domain: Union[str, None] = None
+) -> Tuple[DataLoader, DataLoader, DataLoader, str]:
+    if target_domain is None:
+        target_domain = get_expected_input(
+            "Please choose the target domain:", sorted(df["domain"].unique())
+        )
+
+    df_train_and_val, df_test = split_domains(df, target_domain)
+
+    val_domain = {
+        "sketch": "cartoon",
+        "photos": "art_painting",
+        "cartoon": "sketch",
+        "art_painting": "photo",
+    }[target_domain]
+
+    df_train, df_val = split_domains(df_train_and_val, val_domain)
+
+    train_loader = get_dataloader(df_train, batch_size=BATCH_SIZE)
+    val_loader = get_dataloader(df_val, batch_size=BATCH_SIZE)
+    test_loader = get_dataloader(df_test, batch_size=BATCH_SIZE)
     return train_loader, val_loader, test_loader, target_domain
