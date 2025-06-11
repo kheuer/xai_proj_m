@@ -12,7 +12,7 @@ python test.py \
 --dataset_mode single \
 --phase test \
 --gpu_id 0 \
---checkpoints_dir ./checkpoints/ \
+--checkpoints_dir ./checkpoints/ckpt_cartoon \
 --loadSize 256 \
 --which_epoch latest \
 --which_direction AtoB \

@@ -72,7 +72,7 @@ specify the target domain (domain to leave out from training) using
 --targetdomain <targetdomain>
 ```
 where <targetdomain> is the name of the corresponding directory\
-as parameter in train.sh
+as parameter IN train.sh
 
 ### continue train
 add

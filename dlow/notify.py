@@ -1,4 +1,7 @@
 import os
+from io import BytesIO
+
+from PIL import Image
 from dotenv import load_dotenv
 import requests
 
@@ -8,10 +11,24 @@ load_dotenv()
 ALERT_URL = os.getenv("ALERT_URL")
 INFO_URL = os.getenv("INFO_URL")
 
-def send_discord_notification(webhook_url, message):
+def send_discord_notification(webhook_url, message, image_array=None, filename="image.png"):
     data = {"content": message}
-    response = requests.post(webhook_url, json=data)
-    if response.status_code != 204:
+    files = None
+
+    if image_array is not None:
+        # Convert NumPy array to image
+        image = Image.fromarray(image_array.astype("uint8"))
+        buffer = BytesIO()
+        image.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        files = {"file": (filename, buffer, "image/png")}
+        response = requests.post(webhook_url, data=data, files=files)
+        buffer.close()
+    else:
+        response = requests.post(webhook_url, json=data)
+
+    if response.status_code not in (200, 204):
         print(f"Failed: {response.status_code} - {response.text}")
 
 

@@ -1,4 +1,8 @@
 import os
+
+import numpy as np
+
+from dlow.models.test_model import TestModel
 from options.test_options import TestOptions
 from data import CreateDataLoader
 from models import create_model
@@ -13,12 +17,13 @@ if __name__ == '__main__':
     opt.serial_batches = True  # no shuffle
     opt.no_flip = True  # no flip
     opt.display_id = -1  # no visdom display
-    weights = [
-        [1.0, 0.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0, 0.0],
-        [0.0, 0.0, 1.0, 0.0],
-        [0.0, 0.0, 0.5, 0.5]
-    ]
+    weights = [[x / 4] * 4 for x in range(5)]
+    #     [[0.0, 0.0, 0.0, 0.0],
+    #     [1.0, 0.0, 0.0, 0.0],
+    #     [1.0, 0.0, 0.0, 0.0],
+    #     [1.0, 0.0, 0.0, 0.0]
+    # ]
+
 
     data_loader = CreateDataLoader(opt)
     dataset = data_loader.load_data()
@@ -26,7 +31,9 @@ if __name__ == '__main__':
     for weight in weights:
 
         opt.label_intensity_styletransfer = weight
-        model = create_model(opt)
+        print(os.getcwd())
+        model = TestModel('./checkpoints/ckpt_single')
+        # model = create_model(opt)
         visualizer = Visualizer(opt)
         # create website
         web_dir = os.path.join(opt.results_dir, opt.name, '%s_%s' % (opt.phase, opt.which_epoch))
@@ -39,7 +46,7 @@ if __name__ == '__main__':
         for i, data in enumerate(dataset):
             if i >= opt.how_many:
                 break
-            model.set_input(data, 0, 0)
+            model.set_input(data, weight)
             model.test()
             visuals = model.get_current_visuals()
             img_path = model.get_image_paths()

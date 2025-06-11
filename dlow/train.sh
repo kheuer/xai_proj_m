@@ -10,13 +10,14 @@ nohup python train.py \
 --dataset_mode unaligned \
 --model cycle_gan \
 --checkpoints_dir ./checkpoints \
---batchSize 2 \
+--batchSize 8 \
 --gpu_ids 0 \
 --lambda_identity 0 \
 --lambda_GA 0 \
 --lambda_GB 0 \
 --display_id -1 \
 --save_epoch_freq 5 \
---targetdomain photo \
+--targetdomain art_painting \
+--sourcedomain cartoon \
 --discord \
 > output.log 2>&1 &

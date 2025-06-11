@@ -37,4 +37,5 @@ class TrainOptions(BaseOptions):
         self.parser.add_argument('--lambda_GB_classification_0to1', type=float, default=1, help='weight for cycle loss (A -> B -> A)')
         self.parser.add_argument('--progressive_epoch', type=int, default=111, help='total progressive epoch')
         self.parser.add_argument('--targetdomain', type=str, required=True)
+        self.parser.add_argument('--sourcedomain', type=str, required=True)
         self.isTrain = True
