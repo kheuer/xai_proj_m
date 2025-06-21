@@ -12,7 +12,7 @@ class StyleTransformer(object):
        multiple domains to transform input images.
        """
 
-    def __init__(self, ckpt_dir, target_domain):
+    def __init__(self, ckpt_dir, target_domain, img_size = (227, 227)):
         """
         Initializes the transformer with two source-domain models.
 
@@ -25,7 +25,7 @@ class StyleTransformer(object):
 
         self.model1 = TestModel(ckpt_path1)
         self.model2 = TestModel(ckpt_path2)
-        self.resizer = torchvision.transforms.Resize((227, 227))
+        self.resizer = torchvision.transforms.Resize(img_size)
 
     def __call__(self, img):
         """
