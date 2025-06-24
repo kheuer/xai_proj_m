@@ -67,7 +67,7 @@ class StyleTransformer(object):
         """
         ckpts_dirs = os.listdir(ckpt_dir)
         usable_ckpt_dirs = [ckpt_dir for ckpt_dir in ckpts_dirs if target_domain not in ckpt_dir]
-
+        assert len(usable_ckpt_dirs) == 2
         return os.path.join(ckpt_dir, usable_ckpt_dirs[0]), os.path.join(ckpt_dir, usable_ckpt_dirs[1])
 
 
