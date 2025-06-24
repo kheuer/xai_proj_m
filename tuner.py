@@ -23,7 +23,7 @@ pretrained = {"Yes": True, "No": False}[
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 
-transformations = {"Yes": True, "No": False}[
+use_transformations = {"Yes": True, "No": False}[
     get_expected_input("Apply transformations during training? ", ("Yes", "No"))
 ]
 
@@ -32,7 +32,7 @@ _, df_sampled = split_df(dataset["df"], test_size=0.2)
 
 train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled)
 
-STUDY_NAME = f"STUDY_{model_name}_{target_domain}_pretrained_{pretrained}_transformations_{transformations}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
+STUDY_NAME = f"STUDY_{model_name}_{target_domain}_pretrained_{pretrained}_transformations_{use_transformations}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 
 
 def objective_simple(trial: optuna.trial.Trial):
@@ -188,9 +188,10 @@ if __name__ == "__main__":
         study_name=STUDY_NAME,
     )
 
-    objective = {True: objective_transformations, False: objective_simple}[
-        transformations
-    ]
+    if use_transformations:
+        objective = objective_transformations
+    else:
+        objective = objective_simple
 
     study.optimize(
         objective, gc_after_trial=True, callbacks=[print_callback, write_callback]

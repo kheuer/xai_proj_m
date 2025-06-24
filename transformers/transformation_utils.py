@@ -5,6 +5,7 @@ from torchvision import transforms
 from torchvision.transforms import AugMix, Compose
 from transformers.fourier_transformer import FourierTransformer
 from transformers.jigsaw_transformer import JigsawTransform
+from transformers.style_transformer import StyleTransformer
 from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 
 
@@ -21,7 +22,7 @@ def get_transform_pipeline(params: dict) -> Callable:
                 def __call__(self, x):
                     return x / 255.0
 
-            augmix = Compose(
+            augmix_transform = Compose(
                 [
                     ScaleTo255(),
                     AugMix(
@@ -35,20 +36,21 @@ def get_transform_pipeline(params: dict) -> Callable:
                     Normalize(),
                 ]
             )
-            transformations.append(augmix)
+            transformations.append(augmix_transform)
 
         elif fn == "Fourier" and params["USE_FOURIER"]:
-            fourier = transforms.Compose(
+
+            fourier_transform = transforms.Compose(
                 [
                     FourierTransformer(
                         square_size=params["SQUARE_SIZE"], eta=params["ETA"]
                     )
                 ]
             )
-            transformations.append(fourier)
+            transformations.append(fourier_transform)
 
-        elif fn == "Jigsaw" == params["USE_JIGSAW"]:
-            jigsaw = transforms.Compose(
+        elif fn == "Jigsaw" and params["USE_JIGSAW"]:
+            jigsaw_transform = transforms.Compose(
                 [
                     JigsawTransform(
                         min_grid_size=params["MIN_GRID_SIZE"],
@@ -56,11 +58,13 @@ def get_transform_pipeline(params: dict) -> Callable:
                     )
                 ]
             )
-            transformations.append(jigsaw)
+            transformations.append(jigsaw_transform)
 
         elif fn == "Dlow" and params["USE_DLOW"]:
-            # TODO: add the 4th transformation here once it is done
-            pass
+            dlow_transform = transforms.Compose(
+                [StyleTransformer(ckpt_dir="dlow/checkpoints/", target_domain="sketch")]
+            )
+            transformations.append(dlow_transform)
 
     # no transformations are activated
     if not transformations:
