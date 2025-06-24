@@ -62,7 +62,12 @@ def get_transform_pipeline(params: dict) -> Callable:
 
         elif fn == "Dlow" and params["USE_DLOW"]:
             dlow_transform = transforms.Compose(
-                [StyleTransformer(ckpt_dir="dlow/checkpoints/", target_domain="sketch")]
+                [
+                    StyleTransformer(
+                        ckpt_dir="dlow/checkpoints/",
+                        target_domain=params["TARGET_DOMAIN"],
+                    )
+                ]
             )
             transformations.append(dlow_transform)
 
