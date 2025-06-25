@@ -1,4 +1,5 @@
 from typing import Callable, Union, List
+from copy import deepcopy
 from functools import reduce
 import optuna
 from torchvision import transforms
@@ -66,4 +67,4 @@ def get_transform_pipeline(params: dict) -> Callable:
     if not transformations:
         return lambda x: x
     else:
-        return lambda x: reduce(lambda acc, t: t(acc), transformations, x)
+        return lambda x: reduce(lambda acc, t: t(acc), transformations, deepcopy(x))

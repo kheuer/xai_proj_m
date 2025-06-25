@@ -1,5 +1,6 @@
 import os
 import gc
+from copy import deepcopy
 from tqdm import tqdm
 from itertools import product
 from torch import save
@@ -29,13 +30,12 @@ with open(filename, "w") as f:
     f.write(f"RANDOM SEED: {seed}")
 
 
-params = {
+params_resnet_18_random = {
     "EPOCHS": 300,
     "PATIENCE": 50,
     "LEARNING_RATE": 0.001,
     "BETA_1": 0.9,
     "BETA_2": 0.999,
-    "BATCH_SIZE": 32,
     "OPTIMIZER": "SGD",
     "SCHEDULER": "CosineAnnealingLR",
     "MOMENTUM": 0.53,
@@ -44,7 +44,65 @@ params = {
     # augmentation params
     "TRANSFORMATIONS_ORDER": [],
 }
-augmented = bool(params["TRANSFORMATIONS_ORDER"])
+
+params_resnet_18_pretrained = {
+    "EPOCHS": 300,
+    "PATIENCE": 50,
+    "LEARNING_RATE": 0.0037,
+    "BETA_1": 0.95,
+    "BETA_2": 0.9999,
+    "OPTIMIZER": "SGD",
+    "SCHEDULER": "CosineAnnealingLR",
+    "MOMENTUM": 0.736,
+    "DAMPENING": 0.0327,
+    "WEIGHT_DECAY": 0.0068,
+    # augmentation params
+    "TRANSFORMATIONS_ORDER": [],
+}
+
+
+params_resnet_50_pretrained = {
+    "EPOCHS": 300,
+    "PATIENCE": 50,
+    "LEARNING_RATE": 0.0059,
+    "BETA_1": 0.8,
+    "BETA_2": 0.99,
+    "WEIGHT_DECAY": 0.0068,
+    "OPTIMIZER": "SGD",
+    "SCHEDULER": "StepLR",
+    "MOMENTUM": 0.6991,
+    "DAMPENING": 0.0713,
+    "GAMMA": 0.40,
+    "STEP_SIZE": 29,
+    # augmentation params
+    "TRANSFORMATIONS_ORDER": [],
+}
+
+params_resnet_50_random = {
+    "EPOCHS": 300,
+    "PATIENCE": 50,
+    "LEARNING_RATE": 0.0085,
+    "BETA_1": 0.95,
+    "BETA_2": 0.999,
+    "WEIGHT_DECAY": 0.08,
+    "OPTIMIZER": "SGD",
+    "SCHEDULER": "LinearLR",
+    "MOMENTUM": 0.81,
+    "DAMPENING": 0.17,
+    "GAMMA": 0.17,
+    "STEP_SIZE": 47,
+    # augmentation params
+    "TRANSFORMATIONS_ORDER": [],
+}
+
+
+augmented = bool(params_resnet_18_pretrained["TRANSFORMATIONS_ORDER"])
+assert (
+    bool(params_resnet_18_pretrained["TRANSFORMATIONS_ORDER"])
+    == bool(params_resnet_18_random["TRANSFORMATIONS_ORDER"])
+    == bool(params_resnet_50_pretrained["TRANSFORMATIONS_ORDER"])
+    == bool(params_resnet_50_random["TRANSFORMATIONS_ORDER"])
+)
 
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
@@ -67,8 +125,16 @@ for model_name, pretrained, target_domain in tqdm(
     for _ in range(4):
         if model_name == "ResNet18":
             model = get_resnet_18(pretrained=pretrained)
+            if pretrained:
+                params = deepcopy(params_resnet_18_pretrained)
+            else:
+                params = deepcopy(params_resnet_18_random)
         elif model_name == "ResNet50":
             model = get_resnet_50(pretrained=pretrained)
+            if pretrained:
+                params = deepcopy(params_resnet_50_pretrained)
+            else:
+                params = deepcopy(params_resnet_50_random)
 
         loss, weights = calculate_val_loss(
             train_loader=train_loader,
