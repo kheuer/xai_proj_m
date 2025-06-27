@@ -6,6 +6,7 @@ from torchvision import transforms
 from torchvision.transforms import AugMix, Compose
 from transformers.fourier_transformer import FourierTransformer
 from transformers.jigsaw_transformer import JigsawTransform
+from transformers.style_transformer import StyleTransformer
 from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 
 
@@ -51,7 +52,7 @@ def get_transform_pipeline(params: dict) -> Callable:
             )
             transformations.append(fourier)
 
-        elif fn == "Jigsaw" == params["USE_JIGSAW"]:
+        elif fn == "Jigsaw" and params["USE_JIGSAW"]:
             collect.append(fn)
             jigsaw = transforms.Compose(
                 [
@@ -65,8 +66,10 @@ def get_transform_pipeline(params: dict) -> Callable:
 
         elif fn == "Dlow" and params["USE_DLOW"]:
             collect.append(fn)
-            # TODO: add the 4th transformation here once it is done
-            pass
+            style_transform = transforms.Compose(
+                [StyleTransformer("dlow/checkpoints/", params["TARGET_DOMAIN"])]
+            )
+            transformations.append(style_transform)
 
     print("setup pipeline with transformations:", collect)
     if not transformations:
