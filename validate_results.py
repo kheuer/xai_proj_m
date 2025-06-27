@@ -20,12 +20,14 @@ builder = {
     "pretrained": [],
     "test_loss": [],
     "test_accuracy": [],
+    "i": [],
 }
 
 for filename in tqdm(os.listdir("weights")):
-    architecture, target_domain, pretrained, augmented = filename.replace(
+    architecture, target_domain, pretrained, augmented, i = filename.replace(
         "art_painting", "art-painting"
     ).split("_")
+    i = i.removesuffix(".pth")
     if target_domain == "art-painting":
         target_domain = "art_painting"
     pretrained = pretrained.startswith("True")
@@ -48,6 +50,7 @@ for filename in tqdm(os.listdir("weights")):
     builder["taget_domain"].append(target_domain)
     builder["architecture"].append(architecture)
     builder["pretrained"].append(pretrained)
+    builder["i"].append(i)
 
     loss, accuracy = _do_eval(
         model=model,
@@ -57,6 +60,8 @@ for filename in tqdm(os.listdir("weights")):
     )
     builder["test_loss"].append(loss)
     builder["test_accuracy"].append(accuracy)
+
+    del model
 
 df = pd.DataFrame(builder)
 df.to_csv("results.csv")

@@ -10,9 +10,11 @@ from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 
 
 def get_transform_pipeline(params: dict) -> Callable:
+    collect = []
     transformations = []
     for fn in params["TRANSFORMATIONS_ORDER"]:
         if fn == "Augmix" and params["USE_AUGMIX"]:
+            collect.append(fn)
 
             class ScaleTo255:
                 def __call__(self, x):
@@ -39,6 +41,7 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(augmix)
 
         elif fn == "Fourier" and params["USE_FOURIER"]:
+            collect.append(fn)
             fourier = transforms.Compose(
                 [
                     FourierTransformer(
@@ -49,6 +52,7 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(fourier)
 
         elif fn == "Jigsaw" == params["USE_JIGSAW"]:
+            collect.append(fn)
             jigsaw = transforms.Compose(
                 [
                     JigsawTransform(
@@ -60,11 +64,13 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(jigsaw)
 
         elif fn == "Dlow" and params["USE_DLOW"]:
+            collect.append(fn)
             # TODO: add the 4th transformation here once it is done
             pass
 
-    # no transformations are activated
+    print("setup pipeline with transformations:", collect)
     if not transformations:
+        # no transformations are activated
         return lambda x: x
     else:
         return lambda x: reduce(lambda acc, t: t(acc), transformations, deepcopy(x))

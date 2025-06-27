@@ -5,9 +5,16 @@ from tqdm import tqdm
 from itertools import product
 from torch import save
 from torch.cuda import empty_cache
-from models import get_resnet_18, get_resnet_50, calculate_val_loss
+from models import (
+    get_resnet_18,
+    get_resnet_50,
+    calculate_val_loss,
+    _do_eval,
+    get_criterion,
+)
 from dataset_utils import all_datasets, seed
 from utils import split_df_into_loaders
+from transformers.transformation_utils import get_transform_pipeline
 
 
 filename = "final_results.txt"
@@ -112,6 +119,15 @@ model_names = ("ResNet18", "ResNet50")
 pretrained_options = (True, False)
 target_domains = dataset["domains"]
 
+
+def log(msg):
+    print(msg)
+    with open(filename, "a") as f:
+        f.write(msg)
+
+
+N_RUNS = 4
+
 for model_name, pretrained, target_domain in tqdm(
     product(model_names, pretrained_options, target_domains),
     total=len(model_names) * len(pretrained_options) * len(target_domains),
@@ -122,7 +138,8 @@ for model_name, pretrained, target_domain in tqdm(
     )
 
     losses = []
-    for _ in range(4):
+    accuracies = []
+    for i in range(N_RUNS):
         if model_name == "ResNet18":
             model = get_resnet_18(pretrained=pretrained)
             if pretrained:
@@ -136,7 +153,7 @@ for model_name, pretrained, target_domain in tqdm(
             else:
                 params = deepcopy(params_resnet_50_random)
 
-        loss, weights = calculate_val_loss(
+        _, weights = calculate_val_loss(
             train_loader=train_loader,
             test_loader=test_loader,
             val_loader=val_loader,
@@ -144,13 +161,23 @@ for model_name, pretrained, target_domain in tqdm(
             HYPERPARAMS=params,
             return_best_weights=True,
         )
-        losses.append(loss)
-        if losses[-1] == min(losses):
-            save(
-                weights,
-                f"weights/{model_name}_{target_domain}_{pretrained}_{augmented}.pth",
-            )
 
+        loss, accuracy = _do_eval(
+            model=model,
+            criterion=get_criterion(train_loader),
+            dataloader=test_loader,
+            transformation_pipeline=get_transform_pipeline(params),
+        )
+        accuracies.append(accuracy)
+        losses.append(loss)
+
+        save(
+            weights,
+            f"weights/{model_name}_{target_domain}_{pretrained}_{augmented}_{i}.pth",
+        )
+        log(
+            f"\n{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}, augmented = {augmented}. Single accuracy: {accuracy}. Single loss: {loss}"
+        )
     # manual garbage collection to avoid cuda OOM errors
     del weights
     del train_loader
@@ -160,11 +187,9 @@ for model_name, pretrained, target_domain in tqdm(
     del model
     gc.collect()
     empty_cache()
-
-    msg = f"\n{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}, augmented = {augmented}: {losses}"
-    # print(msg)
-    with open(filename, "a") as f:
-        f.write(msg)
+    log(
+        f"\n{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}, augmented = {augmented}. Mean accuracy: {sum(accuracies)/N_RUNS}. Mean loss: {sum(losses)/N_RUNS}"
+    )
 
 # create the csv file with results
 import validate_results
