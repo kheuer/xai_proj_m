@@ -3,6 +3,7 @@ from copy import deepcopy
 from functools import reduce
 import optuna
 from torchvision import transforms
+from torchvision.transforms import InterpolationMode
 from torchvision.transforms import AugMix, Compose
 from transformers.fourier_transformer import FourierTransformer
 from transformers.jigsaw_transformer import JigsawTransform
@@ -13,7 +14,7 @@ from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 def get_transform_pipeline(params: dict) -> Callable:
     collect = []
     transformations = []
-    for fn in params["TRANSFORMATIONS_ORDER"]:
+    for fn in params["TRANSFORMATIONS_ORDER"].split(","):
         if fn == "Augmix" and params["USE_AUGMIX"]:
             collect.append(fn)
 
@@ -25,6 +26,11 @@ def get_transform_pipeline(params: dict) -> Callable:
                 def __call__(self, x):
                     return x / 255.0
 
+            if params["INTERPOLATION"] == "NEAREST":
+                interpolation = InterpolationMode.NEAREST
+            elif params["INTERPOLATION"] == "BILINEAR":
+                interpolation = InterpolationMode.BILINEAR
+
             augmix = Compose(
                 [
                     ScaleTo255(),
@@ -34,7 +40,7 @@ def get_transform_pipeline(params: dict) -> Callable:
                         chain_depth=params["CHAIN_DEPTH"],
                         alpha=params["ALPHA"],
                         all_ops=params["ALL_OPS"],
-                        interpolation=params["INTERPOLATION"],
+                        interpolation=interpolation,
                     ),
                     Normalize(),
                 ]

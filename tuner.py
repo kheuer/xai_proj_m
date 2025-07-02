@@ -107,7 +107,7 @@ def objective_transformations(trial: optuna.trial.Trial):
         "ALPHA": trial.suggest_float("ALPHA", 0.0, 1.0),
         "ALL_OPS": trial.suggest_categorical("ALL_OPS", [True, False]),
         "INTERPOLATION": trial.suggest_categorical(
-            "INTERPOLATION", [InterpolationMode.NEAREST, InterpolationMode.BILINEAR]
+            "INTERPOLATION", ["NEAREST", "BILINEAR"]
         ),
         # Fourier params
         "USE_FOURIER": trial.suggest_categorical("USE_FOURIER", [True, False]),
@@ -117,20 +117,21 @@ def objective_transformations(trial: optuna.trial.Trial):
         "ETA": trial.suggest_float("ETA", 0, 1),
         # Jigsaw params
         "USE_JIGSAW": trial.suggest_categorical("USE_JIGSAW", [True, False]),
-        "MIN_GRID_SIZE": trial.suggest_int("MIN_GRID_SIZE", 2, 6),
+        "MIN_GRID_SIZE": trial.suggest_int("MIN_GRID_SIZE", 2, 5),
         "MAX_GRID_SIZE": trial.suggest_int("MAX_GRID_SIZE", 6, 15),
         # Dlow params
-        "USE_DLOW": False,
+        "USE_DLOW": trial.suggest_categorical("USE_DLOW", [True, False]),
+        "TARGET_DOMAIN": target_domain,
         # Order params
         "TRANSFORMATIONS_ORDER": trial.suggest_categorical(
             "TRANSFORMATIONS_ORDER",
             [
-                ("Augmix", "Dlow", "Fourier", "Jigsaw"),
-                ("Augmix", "Fourier", "Dlow", "Jigsaw"),
-                ("Fourier", "Augmix", "Dlow", "Jigsaw"),
-                ("Fourier", "Dlow", "Augmix", "Jigsaw"),
-                ("Dlow", "Augmix", "Fourier", "Jigsaw"),
-                ("Dlow", "Fourier", "Augmix", "Jigsaw"),
+                "Augmix,Dlow,Fourier,Jigsaw",
+                "Augmix,Fourier,Dlow,Jigsaw",
+                "Fourier,Augmix,Dlow,Jigsaw",
+                "Fourier,Dlow,Augmix,Jigsaw",
+                "Dlow,Augmix,Fourier,Jigsaw",
+                "Dlow,Fourier,Augmix,Jigsaw",
             ],
         ),
     }

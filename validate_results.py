@@ -8,9 +8,6 @@ from dataset_utils import all_datasets, split_df
 from utils import split_df_into_loaders
 from cuda import device
 
-AUGMENTATION_HYPERPARAMS = {
-    "TRANSFORMATIONS_ORDER": [],
-}
 
 dataset = all_datasets["pacs"]
 
@@ -45,7 +42,11 @@ for filename in tqdm(os.listdir("weights")):
         df=dataset["df"], target_domain=target_domain
     )
 
-    transformation_pipeline = get_transform_pipeline(params=AUGMENTATION_HYPERPARAMS)
+    transformation_pipeline = get_transform_pipeline(
+        params={
+            "TRANSFORMATIONS_ORDER": "",
+        }
+    )
 
     builder["taget_domain"].append(target_domain)
     builder["architecture"].append(architecture)
