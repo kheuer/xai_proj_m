@@ -67,7 +67,10 @@ N_RUNS = 4
 
 for augmented, model_name, pretrained, target_domain in tqdm(
     product(augmentations, model_names, pretrained_options, target_domains),
-    total=len(model_names) * len(pretrained_options) * len(target_domains),
+    total=len(model_names)
+    * len(pretrained_options)
+    * len(target_domains)
+    * len(augmentations),
     desc="Running combinations",
 ):
     print(
@@ -86,6 +89,13 @@ for augmented, model_name, pretrained, target_domain in tqdm(
     losses = []
     accuracies = []
     for i in range(N_RUNS):
+        save_path = (
+            f"weights/{model_name}_{target_domain}_{pretrained}_{augmented}_{i}.pth"
+        )
+        if os.path.exists(save_path):
+            print("skipping", save_path)
+            continue
+
         if model_name == "ResNet18":
             model = get_resnet_18(pretrained=pretrained)
             name = "resnet_18"
@@ -120,18 +130,19 @@ for augmented, model_name, pretrained, target_domain in tqdm(
 
         save(
             weights,
-            f"weights/{model_name}_{target_domain}_{pretrained}_{augmented}_{i}.pth",
+            save_path,
         )
         log(
             f"\n{model_name} model with target_domain = {target_domain}, pretrained = {pretrained}, augmented = {augmented}. Single accuracy: {accuracy}. Single loss: {loss}"
         )
     # manual garbage collection to avoid cuda OOM errors
-    del weights
-    del train_loader
-    del val_loader
-    del test_loader
-    model.to("cpu")
-    del model
+    if globals().get("weights"):
+        del weights
+        del train_loader
+        del val_loader
+        del test_loader
+        model.to("cpu")
+        del model
     gc.collect()
     empty_cache()
     log(

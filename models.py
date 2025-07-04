@@ -73,7 +73,7 @@ def calculate_val_loss(
             optimizer = torch.optim.AdamW(
                 model.parameters(),
                 lr=HYPERPARAMS["LEARNING_RATE"],
-                betas=HYPERPARAMS["BETAS"],
+                betas=(HYPERPARAMS["BETA_1"], HYPERPARAMS["BETA_2"]),
                 weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
                 maximize=False,
             )

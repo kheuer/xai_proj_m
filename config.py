@@ -1,5 +1,5 @@
 MAX_EPOCHS = 300
-PATIENCE = 50
+PATIENCE = 25
 BATCH_SIZE = 32
 
 params_resnet_18_random = {
@@ -121,7 +121,7 @@ params_resnet_50_random_augmented = {
     "USE_AUGMIX": False,
     # Fourier
     "USE_FOURIER": True,
-    "SQUARE_SIZE_SINGLE_SIDE": 72,
+    "SQUARE_SIZE": 72,
     "ETA": 0.4767002143366463,
     # Jigsaw
     "USE_JIGSAW": False,
