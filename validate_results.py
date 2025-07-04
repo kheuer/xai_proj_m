@@ -1,4 +1,5 @@
 import os
+import gc
 from tqdm import tqdm
 import pandas as pd
 from torch import load, nn
@@ -7,7 +8,7 @@ from transformers.transformation_utils import get_transform_pipeline
 from dataset_utils import all_datasets, split_df
 from utils import split_df_into_loaders
 from cuda import device
-
+from torch.cuda import empty_cache
 
 dataset = all_datasets["pacs"]
 
@@ -15,6 +16,7 @@ builder = {
     "taget_domain": [],
     "architecture": [],
     "pretrained": [],
+    "augmented": [],
     "test_loss": [],
     "test_accuracy": [],
     "i": [],
@@ -53,6 +55,7 @@ def main():
         builder["taget_domain"].append(target_domain)
         builder["architecture"].append(architecture)
         builder["pretrained"].append(pretrained)
+        builder["augmented"].append(augmented)
         builder["i"].append(i)
 
         loss, accuracy = _do_eval(
@@ -64,8 +67,15 @@ def main():
         builder["test_loss"].append(loss)
         builder["test_accuracy"].append(accuracy)
 
+        model.to("cpu")
         del model
-
+        del state_dict
+        del train_loader
+        del _
+        del test_loader
+        del transformation_pipeline
+    gc.collect()
+    empty_cache()
     df = pd.DataFrame(builder)
     df.to_csv("results.csv")
     print(df)

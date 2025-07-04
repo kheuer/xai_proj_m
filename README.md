@@ -19,3 +19,14 @@ To run this using Google Colab, execute:
 !unzip pacs-dataset.zip -d pacs-dataset
 !rm -f pacs-dataset.zip 
 ```
+
+
+# How to proceed
+
+Resnet 18
+Pretrained = False
+Augmentations = True
+
+tune for all 4 hyperparam combinations and compare losses
+
+use new dataset
