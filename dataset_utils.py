@@ -66,7 +66,7 @@ if dataset == "pacs":
 
 elif dataset == "camelyon":
     print("tmpdir:")
-    print(os.environ.get("TMPDIR"))
+    print(os.listdir(os.environ.get("TMPDIR")))
     print("-" * 10)
     df = pd.read_csv(os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/metadata.csv"))
     total_images = 10000
