@@ -65,10 +65,10 @@ if dataset == "pacs":
                 builder["image"].append(path)
 
 elif dataset == "camelyon":
-    print("cwd:")
-    print(os.listdir(os.getcwd()))
+    print("tmpdir:")
+    print(os.environ.get("TMPDIR"))
     print("-" * 10)
-    df = pd.read_csv("camelyon17/data/camelyon17_v1.0/metadata.csv")
+    df = pd.read_csv(os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/metadata.csv"))
     total_images = 10000
     TUMOR, NO_TUMOR = 1, 0
     categories = [TUMOR, NO_TUMOR]
