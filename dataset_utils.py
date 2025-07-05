@@ -76,7 +76,7 @@ elif dataset == "camelyon":
     combinations = list(itertools.product(categories, nodes))
     imgs_per_combination = total_images // len(combinations)
     selected_rows = []
-    pre_path = "camelyon17/data/camelyon17_v1.0/patches"
+    pre_path = os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/patches")
 
     for category, node in combinations:
         tmp = df[(df["tumor"] == category) & (df["node"] == node)].head(imgs_per_combination)
