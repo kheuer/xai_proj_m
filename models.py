@@ -14,9 +14,14 @@ from transformers.transformation_utils import get_transform_pipeline
 
 
 def get_resnet_18(pretrained: bool) -> torchvision.models.resnet18:
-    resnet18 = torchvision.models.resnet18(
-        weights="IMAGENET1K_V1" if pretrained else None
-    )
+    # resnet18 = (
+    #     torchvision.models.resnet18(
+    #     weights="IMAGENET1K_V1" if pretrained else None
+    # ))
+
+    resnet18 = torchvision.models.resnet18(weights=None)
+    resnet18.load_state_dict(torch.load("resnet18.pth"))
+
     resnet18.fc = nn.Sequential(
         nn.Dropout(0.5),
         nn.Linear(
