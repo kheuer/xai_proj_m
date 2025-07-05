@@ -227,11 +227,23 @@ def _do_eval(
     criterion: torch.nn.CrossEntropyLoss,
     dataloader: torch.utils.data.DataLoader,
     transformation_pipeline: Callable,
-) -> tuple[float, float]:
+) -> tuple[float, float, dict]:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
-    correct = 0
+    # correct = 0
     total = 0
+
+    TP = (1, 1)
+    TN = (0, 0)
+    FP = (1, 0)
+    FN = (0, 1)
+
+    metrics = {
+        TP: 0,
+        TN: 0,
+        FP: 0,
+        FN: 0
+    }
 
     with torch.no_grad():
         for features, labels in dataloader:
@@ -244,9 +256,16 @@ def _do_eval(
 
             # Calculate predictions and compare to labels
             _, predicted = torch.max(outputs, 1)
-            correct += (predicted == labels).sum().item()
+
+            for predited, actual in list(zip(predicted.tolist(), labels.tolist())):
+                metrics[(predited, actual)] += 1
+
+            # correct += (predicted == labels).sum().item()
             total += labels.size(0)
 
     avg_loss = validation_loss / len(dataloader)
+
+    correct = metrics[TP] + metrics[TN]
+
     accuracy = correct / total if total > 0 else 0.0
-    return avg_loss, accuracy
+    return avg_loss, accuracy, metrics

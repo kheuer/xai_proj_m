@@ -1,5 +1,5 @@
 """this module optimizes the hyperparameters"""
-
+import argparse
 import os
 import shutil
 from datetime import datetime
@@ -15,23 +15,47 @@ from models import (
 )
 from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE, NUM_TRIALS, SAVE_FREQ
 
-model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
-pretrained = {"Yes": True, "No": False}[
-    get_expected_input("Use pre-trained weights? ", ("Yes", "No"))
-]
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--model", required=False, type=str, choices=["ResNet18", "ResNet50"])
+parser.add_argument("--pretrained", required=False, type=str, choices=["True", "False"])
+parser.add_argument("--transformations", required=False, type=str, choices=["True", "False"])
+parser.add_argument("--targetdomain", required=False, type=int, choices=[0,1,2,3])
+args = parser.parse_args()
+print(args)
+if hasattr(args, "model"):
+    model_name = args.model
+else:
+    model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
+
+if hasattr(args, "pretrained"):
+    pretrained = True if args.pretrained == "True" else False
+else:
+    pretrained = {"Yes": True, "No": False}[
+        get_expected_input("Use pre-trained weights? ", ("Yes", "No"))
+    ]
+
 
 # TODO: ask the user for input when we obtain another dataset
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 
-transformations = {"Yes": True, "No": False}[
-    get_expected_input("Apply transformations during training? ", ("Yes", "No"))
-]
+if hasattr(args, "transformations"):
+    transformations = True if args.transformations == "True" else False
+else:
+    transformations = {"Yes": True, "No": False}[
+        get_expected_input("Apply transformations during training? ", ("Yes", "No"))
+    ]
 
 # take a random sample to speed up training
 _, df_sampled = split_df(dataset["df"], test_size=0.2)
 
-train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled)
+target_domain = None
+if hasattr(args, "targetdomain"):
+    target_domain = args.targetdomain
+
+train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled, target_domain=target_domain)
 
 STUDY_NAME = f"STUDY_{model_name}_{target_domain}_pretrained_{pretrained}_transformations_{transformations}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 
@@ -77,8 +101,8 @@ def objective_simple(trial: optuna.trial.Trial):
     )
 
     if trial.number % SAVE_FREQ == 0:
-        save_path = os.path.join("trials", "camelyon_study.db")
-        shutil.copy2("camelyon_study.db", save_path)
+        save_path = os.path.join("trials", f"{STUDY_NAME}.db")
+        shutil.copy2(f"{STUDY_NAME}.db", save_path)
 
     return loss
 
@@ -188,7 +212,7 @@ def write_callback(study, trial):
 if __name__ == "__main__":
     # Optimize the study using objective function
     os.makedirs("trials", exist_ok=True)
-    storage_uri = f"sqlite:///camelyon_study.db"
+    storage_uri = f"sqlite:///{STUDY_NAME}.db"
 
     study = optuna.create_study(
         direction="minimize",
