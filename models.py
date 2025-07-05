@@ -175,7 +175,6 @@ def calculate_val_loss(
         # clear cell in case this is run in a jupyter notebook
         clear_output(wait=True)
         plot_loss(train_losses, val_losses, test_losses)
-
         # Early Stopping Check
         if val_losses[-1] < best_loss:
             best_loss = val_losses[-1]

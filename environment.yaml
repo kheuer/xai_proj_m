@@ -1,0 +1,20 @@
+name: xAI-Proj
+channels:
+  - pytorch
+  - defaults
+  - nvidia
+  - anaconda
+  - conda-forge
+dependencies:
+  - pip
+  - python=3.10.16
+  - pip:
+    - pandas
+    - Pillow
+    - tensorboard
+    - optuna
+    - torchvision
+    - matplotlib
+    - datasets
+    - ipython
+    - scikit-learn

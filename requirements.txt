@@ -4,3 +4,6 @@ tensorboard
 optuna
 torchvision
 matplotlib
+datasets
+ipython
+scikit-learn

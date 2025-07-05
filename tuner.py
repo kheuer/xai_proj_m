@@ -1,6 +1,7 @@
 """this module optimizes the hyperparameters"""
 
 import os
+import shutil
 from datetime import datetime
 import optuna
 from torchvision.transforms import InterpolationMode
@@ -12,7 +13,7 @@ from models import (
     all_datasets,
     calculate_val_loss,
 )
-from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE
+from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE, NUM_TRIALS, SAVE_FREQ
 
 model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
 pretrained = {"Yes": True, "No": False}[
@@ -74,6 +75,10 @@ def objective_simple(trial: optuna.trial.Trial):
         model=model,
         HYPERPARAMS=params,
     )
+
+    if trial.number % SAVE_FREQ == 0:
+        save_path = os.path.join("trials", "camelyon_study.db")
+        shutil.copy2("camelyon_study.db", save_path)
 
     return loss
 
@@ -182,16 +187,26 @@ def write_callback(study, trial):
 
 if __name__ == "__main__":
     # Optimize the study using objective function
+    os.makedirs("trials", exist_ok=True)
+    storage_uri = f"sqlite:///camelyon_study.db"
+
     study = optuna.create_study(
         direction="minimize",
         pruner=optuna.pruners.MedianPruner(),
         study_name=STUDY_NAME,
+        storage=storage_uri,
+        load_if_exists=True
     )
+
+    done_trials = len([t for t in study.trials if
+                       t.state == optuna.trial.TrialState.COMPLETE or t.state == optuna.trial.TrialState.PRUNED])
+    remaining_trails = max(0, NUM_TRIALS - done_trials)
 
     objective = {True: objective_transformations, False: objective_simple}[
         transformations
     ]
 
     study.optimize(
-        objective, gc_after_trial=True, callbacks=[print_callback, write_callback]
+        objective, gc_after_trial=True, callbacks=[print_callback, write_callback],
+        n_trials=NUM_TRIALS
     )
