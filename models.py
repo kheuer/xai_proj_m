@@ -74,7 +74,7 @@ def calculate_val_loss(
     model: torchvision.models,
     HYPERPARAMS: dict,
     return_best_weights: bool = False,
-    trial: optuna.Trial = None
+    trial: optuna.trial.Trial = None
 ) -> Union[float, Tuple[float, torch.Tensor]]:
 
     match HYPERPARAMS["OPTIMIZER"]:
