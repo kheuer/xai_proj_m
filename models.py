@@ -1,6 +1,8 @@
 import copy
 import os
 from typing import Union, Tuple, Callable
+
+import optuna
 from IPython.display import clear_output
 import torch
 from torch import nn
@@ -72,6 +74,7 @@ def calculate_val_loss(
     model: torchvision.models,
     HYPERPARAMS: dict,
     return_best_weights: bool = False,
+    trial: optuna.Trial = None
 ) -> Union[float, Tuple[float, torch.Tensor]]:
 
     match HYPERPARAMS["OPTIMIZER"]:
@@ -191,6 +194,9 @@ def calculate_val_loss(
             epochs_without_improvement += 1
             if epochs_without_improvement >= HYPERPARAMS["PATIENCE"]:
                 break
+
+        if trial:
+            trial.report(val_losses[-1], step=epoch)
 
     # Load the best model weights
     # model.load_state_dict(best_model_weights)
