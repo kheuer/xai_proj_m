@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--model", required=False, type=str, choices=["ResNet18", "ResNet50"])
 parser.add_argument("--pretrained", required=False, type=str, choices=["True", "False"])
 parser.add_argument("--transformations", required=False, type=str, choices=["True", "False"])
-parser.add_argument("--targetdomain", required=False, type=int, choices=[0,1,2,3])
+parser.add_argument("--targetdomain", required=False, type=str, choices=["0","1","2","3"])
 args = parser.parse_args()
 print(args)
 if hasattr(args, "model"):
@@ -109,6 +109,7 @@ def objective_simple(trial: optuna.trial.Trial):
 
 
 def objective_transformations(trial: optuna.trial.Trial):
+    InterpolationMode.NEAREST
     params = {
         # LEARNING PARAMS
         "EPOCHS": MAX_EPOCHS,
@@ -137,7 +138,7 @@ def objective_transformations(trial: optuna.trial.Trial):
         "ALPHA": trial.suggest_float("ALPHA", 0.0, 1.0),
         "ALL_OPS": trial.suggest_categorical("ALL_OPS", [True, False]),
         "INTERPOLATION": trial.suggest_categorical(
-            "INTERPOLATION", [InterpolationMode.NEAREST, InterpolationMode.BILINEAR]
+            "INTERPOLATION", ["nearest", "bilinear"]
         ),
         # Fourier params
         "USE_FOURIER": trial.suggest_categorical("USE_FOURIER", [True, False]),
@@ -155,12 +156,12 @@ def objective_transformations(trial: optuna.trial.Trial):
         "TRANSFORMATIONS_ORDER": trial.suggest_categorical(
             "TRANSFORMATIONS_ORDER",
             [
-                ("Augmix", "Dlow", "Fourier", "Jigsaw"),
-                ("Augmix", "Fourier", "Dlow", "Jigsaw"),
-                ("Fourier", "Augmix", "Dlow", "Jigsaw"),
-                ("Fourier", "Dlow", "Augmix", "Jigsaw"),
-                ("Dlow", "Augmix", "Fourier", "Jigsaw"),
-                ("Dlow", "Fourier", "Augmix", "Jigsaw"),
+                "Augmix,Dlow,Fourier,Jigsaw",
+                "Augmix,Fourier,Dlow,Jigsaw",
+                "Fourier,Augmix,Dlow,Jigsaw",
+                "Fourier,Dlow,Augmix,Jigsaw",
+                "Dlow,Augmix,Fourier,Jigsaw",
+                "Dlow,Fourier,Augmix,Jigsaw",
             ],
         ),
     }

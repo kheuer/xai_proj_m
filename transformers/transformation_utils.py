@@ -2,7 +2,7 @@ from typing import Callable, Union, List
 from functools import reduce
 import optuna
 from torchvision import transforms
-from torchvision.transforms import AugMix, Compose
+from torchvision.transforms import AugMix, Compose, InterpolationMode
 from transformers.fourier_transformer import FourierTransformer
 from transformers.jigsaw_transformer import JigsawTransform
 from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
@@ -10,7 +10,18 @@ from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 
 def get_transform_pipeline(params: dict) -> Callable:
     transformations = []
-    for fn in params["TRANSFORMATIONS_ORDER"]:
+
+    transformations.append(
+        Compose([
+            transforms.Resize((227,227))
+        ])
+    )
+
+    transformation_order = params["TRANSFORMATIONS_ORDER"]
+    if len(transformation_order) > 0:
+        transformation_order = tuple(transformation_order.split(","))
+
+    for fn in transformation_order:
         if fn == "Augmix" and params["USE_AUGMIX"]:
 
             class ScaleTo255:
@@ -30,7 +41,7 @@ def get_transform_pipeline(params: dict) -> Callable:
                         chain_depth=params["CHAIN_DEPTH"],
                         alpha=params["ALPHA"],
                         all_ops=params["ALL_OPS"],
-                        interpolation=params["INTERPOLATION"],
+                        interpolation=InterpolationMode.BILINEAR if  params["INTERPOLATION"] == "bilinear" else InterpolationMode.NEAREST,
                     ),
                     Normalize(),
                 ]

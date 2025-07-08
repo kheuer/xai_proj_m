@@ -13,6 +13,7 @@ from torchvision import transforms
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from cuda import device
+from dotenv import load_dotenv
 
 seed = 42  # random.randint(1, 100_000)
 print(f"RANDOM SEED: {seed}")
@@ -20,6 +21,7 @@ print(f"RANDOM SEED: {seed}")
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
+load_dotenv()
 
 transform_to_tensor = transforms.ToTensor()
 transform_to_pil = transforms.ToPILImage()
@@ -65,10 +67,8 @@ if dataset == "pacs":
                 builder["image"].append(path)
 
 elif dataset == "camelyon":
-    print("tmpdir:")
-    print(os.listdir(os.environ.get("TMPDIR")))
-    print("-" * 10)
-    df = pd.read_csv(os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/metadata.csv"))
+    path = os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/metadata.csv")
+    df = pd.read_csv(path)
     total_images = 10000
     TUMOR, NO_TUMOR = 1, 0
     categories = [TUMOR, NO_TUMOR]
@@ -91,7 +91,7 @@ elif dataset == "camelyon":
                 f"patch_patient_{str(patient).zfill(3)}_node_{node}_x_{x}_y_{y}.png"
             )
             builder["labels"].append(category)
-            builder["domain"].append(node)
+            builder["domain"].append(str(node))
             builder["image"].append(img_path)
 
 
