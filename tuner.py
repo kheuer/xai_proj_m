@@ -98,6 +98,7 @@ def objective_simple(trial: optuna.trial.Trial):
         val_loader=val_loader,
         model=model,
         HYPERPARAMS=params,
+        trial=trial
     )
 
     if trial.number % SAVE_FREQ == 0:
