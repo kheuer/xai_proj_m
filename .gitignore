@@ -186,3 +186,4 @@ output_images
 final_results.txt
 *.csv
 *.ipynb
+/camelyon17/
