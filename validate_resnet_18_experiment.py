@@ -1,5 +1,6 @@
 import os
 import gc
+from copy import deepcopy
 from tqdm import tqdm
 import pandas as pd
 from torch import load, nn
@@ -9,6 +10,13 @@ from dataset_utils import all_datasets, split_df
 from utils import split_df_into_loaders
 from cuda import device
 from torch.cuda import empty_cache
+from config import (
+    params_resnet_18_random_augmented_art_painting,
+    params_resnet_18_random_augmented_cartoon,
+    params_resnet_18_random_augmented_sketch,
+    params_resnet_18_random_augmented_photo,
+)
+
 
 dataset = all_datasets["pacs"]
 
@@ -24,21 +32,20 @@ builder = {
 
 
 def main():
-    for filename in tqdm(os.listdir("weights")):
-        architecture, target_domain, pretrained, augmented, i = filename.replace(
-            "art_painting", "art-painting"
-        ).split("_")
-        i = i.removesuffix(".pth")
+    for filename in tqdm(os.listdir("weights_resnet_18_experiment")):
+        print(filename)
+        target_domain, _, _, i = filename.replace("art_painting", "art-painting").split(
+            "_"
+        )
+        i = int(i.removesuffix(".pth"))
         if target_domain == "art-painting":
             target_domain = "art_painting"
-        pretrained = pretrained.startswith("True")
-        augmented = augmented.startswith("True")
-        if architecture == "ResNet18":
-            model = get_resnet_18(pretrained=False)
-        else:
-            model = get_resnet_50(pretrained=False)
 
-        state_dict = load(os.path.join("weights", filename), map_location=device)
+        model = get_resnet_18(pretrained=False)
+
+        state_dict = load(
+            os.path.join("weights_resnet_18_experiment", filename), map_location=device
+        )
         model.load_state_dict(state_dict)
         model.to(device)
 
@@ -46,16 +53,23 @@ def main():
             df=dataset["df"], target_domain=target_domain
         )
 
-        transformation_pipeline = get_transform_pipeline(
-            params={
-                "TRANSFORMATIONS_ORDER": "",
-            }
-        )
+        if target_domain == "art_painting":
+            params = deepcopy(params_resnet_18_random_augmented_art_painting)
+        elif target_domain == "sketch":
+            params = deepcopy(params_resnet_18_random_augmented_sketch)
+        elif target_domain == "photo":
+            params = deepcopy(params_resnet_18_random_augmented_photo)
+        elif target_domain == "cartoon":
+            params = deepcopy(params_resnet_18_random_augmented_cartoon)
+        else:
+            raise RuntimeError("unknown target domain")
+        params["TARGET_DOMAIN"] = target_domain
+        transformation_pipeline = get_transform_pipeline(params=params)
 
         builder["target_domain"].append(target_domain)
-        builder["architecture"].append(architecture)
-        builder["pretrained"].append(pretrained)
-        builder["augmented"].append(augmented)
+        builder["architecture"].append("ResNet18")
+        builder["pretrained"].append(False)
+        builder["augmented"].append(True)
         builder["i"].append(i)
 
         loss, accuracy = _do_eval(
@@ -77,7 +91,7 @@ def main():
     gc.collect()
     empty_cache()
     df = pd.DataFrame(builder)
-    df.to_csv("results.csv")
+    df.to_csv("results_resnet18_experiment.csv")
     print(df)
     return df
 
