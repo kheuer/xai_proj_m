@@ -177,6 +177,7 @@ def objective_transformations(trial: optuna.trial.Trial):
         val_loader=val_loader,
         model=model,
         HYPERPARAMS=params,
+        trial=trial
     )
 
     return loss
