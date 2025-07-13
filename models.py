@@ -157,22 +157,26 @@ def calculate_val_loss(
         )
 
         # Validate the model
-        val_losses.append(
-            _do_eval(
+        val_avg_loss, _, _ = _do_eval(
                 model=model,
                 criterion=criterion,
                 dataloader=val_loader,
                 transformation_pipeline=transformation_pipeline,
-            )[0]
+            )
+
+        val_losses.append(
+            val_avg_loss
         )
 
-        test_losses.append(
-            _do_eval(
+        test_avg_loss, _, _ = _do_eval(
                 model=model,
                 criterion=criterion,
                 dataloader=test_loader,
                 transformation_pipeline=transformation_pipeline,
-            )[0]
+            )
+
+        test_losses.append(
+            test_avg_loss
         )
 
         match HYPERPARAMS["SCHEDULER"]:
