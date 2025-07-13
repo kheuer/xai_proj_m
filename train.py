@@ -75,7 +75,7 @@ for study_file in studies:
                 params["USE_FOURIER"] = []
                 params["USE_JIGSAW"] = []
                 params["USE_DLOW"] = []
-
+            params["USE_DLOW"] = False
             loss, weights = start_training(target_domain=target_domain, model_name=model_name, pretrained=pretrained, params=params)
             print(f"finished training for {rank}. best trial with loss: {loss}")
             weights_path = os.path.join(current_study_dir, f"studynr_{rank}_loss_{str(f'{loss:.2f}').replace('.', ',')}.pth")
