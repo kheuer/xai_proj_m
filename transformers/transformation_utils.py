@@ -49,10 +49,11 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(augmix)
 
         elif fn == "Fourier" and params["USE_FOURIER"]:
+
             fourier = transforms.Compose(
                 [
                     FourierTransformer(
-                        square_size=params["SQUARE_SIZE"], eta=params["ETA"]
+                        square_size=params["SQUARE_SIZE_SINGLE_SIDE"], eta=params["ETA"]
                     )
                 ]
             )

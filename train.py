@@ -33,7 +33,7 @@ def start_training(target_domain: str, model_name: str, pretrained: bool, params
     )
 
 
-study_dir = os.path.join(os.environ.get("TMPDIR"), "studies")
+study_dir = os.path.join(os.environ.get("TMPDIR"), "studies_copy")
 studies = os.listdir(study_dir)
 pattern = r"STUDY_(ResNet\d+)_([0-3])_pretrained_(True|False)_transformations_(True|False)"
 
@@ -62,6 +62,9 @@ for study_file in studies:
         pretrained = match.group(3) == "True"
         transformations = match.group(4) == "True"
 
+        if not (target_domain == str(2) and pretrained == False and transformations):
+            continue
+
         print(f"start training study: {study_name}")
         for rank in range(3):
 
@@ -76,6 +79,7 @@ for study_file in studies:
                 params["USE_JIGSAW"] = []
                 params["USE_DLOW"] = []
             params["USE_DLOW"] = False
+            print(params)
             loss, weights = start_training(target_domain=target_domain, model_name=model_name, pretrained=pretrained, params=params)
             print(f"finished training for {rank}. best trial with loss: {loss}")
             weights_path = os.path.join(current_study_dir, f"studynr_{rank}_loss_{str(f'{loss:.2f}').replace('.', ',')}.pth")

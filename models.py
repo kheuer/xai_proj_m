@@ -77,12 +77,19 @@ def calculate_val_loss(
     trial: optuna.trial.Trial = None
 ) -> Union[float, Tuple[float, torch.Tensor]]:
 
+    if "BETAS" in HYPERPARAMS:
+        betas = HYPERPARAMS["BETAS"]
+    elif "BETA_1" in HYPERPARAMS and "BETA_2" in HYPERPARAMS:
+        betas = (HYPERPARAMS["BETA_1"], HYPERPARAMS["BETA_2"])
+    else:
+        betas = None
+
     match HYPERPARAMS["OPTIMIZER"]:
         case "AdamW":
             optimizer = torch.optim.AdamW(
                 model.parameters(),
                 lr=HYPERPARAMS["LEARNING_RATE"],
-                betas=HYPERPARAMS["BETAS"],
+                betas=betas,
                 weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
                 maximize=False,
             )
