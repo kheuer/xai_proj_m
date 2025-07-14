@@ -62,9 +62,6 @@ for study_file in studies:
         pretrained = match.group(3) == "True"
         transformations = match.group(4) == "True"
 
-        if not (target_domain == str(2) and pretrained == False and transformations):
-            continue
-
         print(f"start training study: {study_name}")
         for rank in range(3):
 
