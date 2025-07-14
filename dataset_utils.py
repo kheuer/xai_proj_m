@@ -1,7 +1,7 @@
 """
 This module creates the DataFrames, import them from here.
 """
-
+import itertools
 import random
 import os
 from typing import Union
@@ -13,6 +13,7 @@ from torchvision import transforms
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from cuda import device
+from dotenv import load_dotenv
 
 seed = 42  # random.randint(1, 100_000)
 print(f"RANDOM SEED: {seed}")
@@ -20,6 +21,7 @@ print(f"RANDOM SEED: {seed}")
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
+load_dotenv()
 
 transform_to_tensor = transforms.ToTensor()
 transform_to_pil = transforms.ToPILImage()
@@ -38,7 +40,7 @@ def to_pil(tensor: torch.Tensor) -> Image:
 
 
 def load_image(path, move_to_device=True):
-    image = Image.open(path)
+    image = Image.open(path).convert("RGB")
     return to_tensor(image, move_to_device=move_to_device)
 
 
@@ -47,25 +49,57 @@ builder = {"labels": [], "image": [], "domain": []}
 
 # iterate over all files, the labels can be obained from
 # the directory structure.
-for domain in (
-    "sketch",
-    "photo",
-    "cartoon",
-    "art_painting",
-):
-    domain_path = os.path.join("pacs-dataset/pacs_data/pacs_data", domain)
-    for label in os.listdir(domain_path):
-        label_path = os.path.join(domain_path, label)
-        for filename in os.listdir(label_path):
-            builder["labels"].append(label)
-            builder["domain"].append(domain)
-            path = os.path.join(label_path, filename)
-            builder["image"].append(path)
+dataset = "camelyon"
+if dataset == "pacs":
+    for domain in (
+        "sketch",
+        "photo",
+        "cartoon",
+        "art_painting",
+    ):
+        domain_path = os.path.join("../pacs-dataset/pacs_data/pacs_data", domain)
+        for label in os.listdir(domain_path):
+            label_path = os.path.join(domain_path, label)
+            for filename in os.listdir(label_path):
+                builder["labels"].append(label)
+                builder["domain"].append(domain)
+                path = os.path.join(label_path, filename)
+                builder["image"].append(path)
+
+elif dataset == "camelyon":
+    path = os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/metadata.csv")
+    df = pd.read_csv(path)
+    total_images = 10000
+    TUMOR, NO_TUMOR = 1, 0
+    categories = [TUMOR, NO_TUMOR]
+    nodes = [0, 1, 2, 3]
+    combinations = list(itertools.product(categories, nodes))
+    imgs_per_combination = total_images // len(combinations)
+    selected_rows = []
+    pre_path = os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/patches")
+
+    for category, node in combinations:
+        tmp = df[(df["tumor"] == category) & (df["node"] == node)].head(imgs_per_combination)
+        for index, row in tmp.iterrows():
+            patient = row["patient"]
+            x = row["x_coord"]
+            y = row["y_coord"]
+            num = row["Unnamed: 0"]
+            img_path = os.path.join(
+                pre_path,
+                f"patient_{str(patient).zfill(3)}_node_{node}",
+                f"patch_patient_{str(patient).zfill(3)}_node_{node}_x_{x}_y_{y}.png"
+            )
+            builder["labels"].append(category)
+            builder["domain"].append(str(node))
+            builder["image"].append(img_path)
+
 
 
 pacs_df = pd.DataFrame(builder)
 pacs_classes = pacs_df["labels"].unique().tolist()
 pacs_df["labels"] = pacs_df["labels"].map(lambda x: pacs_classes.index(x))
+
 
 all_datasets = {
     "pacs": {
