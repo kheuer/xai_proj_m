@@ -1,5 +1,8 @@
 import copy
+import os
 from typing import Union, Tuple, Callable
+
+import optuna
 from IPython.display import clear_output
 import torch
 from torch import nn
@@ -14,9 +17,14 @@ from transformers.transformation_utils import get_transform_pipeline
 
 
 def get_resnet_18(pretrained: bool) -> torchvision.models.resnet18:
-    resnet18 = torchvision.models.resnet18(
-        weights="IMAGENET1K_V1" if pretrained else None
-    )
+    # resnet18 = (
+    #     torchvision.models.resnet18(
+    #     weights="IMAGENET1K_V1" if pretrained else None
+    # ))
+
+    resnet18 = torchvision.models.resnet18(weights=None)
+    resnet18.load_state_dict(torch.load(os.path.join(os.environ.get("TMPDIR") ,"resnet18.pth")))
+
     resnet18.fc = nn.Sequential(
         nn.Dropout(0.5),
         nn.Linear(
@@ -66,14 +74,22 @@ def calculate_val_loss(
     model: torchvision.models,
     HYPERPARAMS: dict,
     return_best_weights: bool = False,
+    trial: optuna.trial.Trial = None
 ) -> Union[float, Tuple[float, torch.Tensor]]:
+
+    if "BETAS" in HYPERPARAMS:
+        betas = HYPERPARAMS["BETAS"]
+    elif "BETA_1" in HYPERPARAMS and "BETA_2" in HYPERPARAMS:
+        betas = (HYPERPARAMS["BETA_1"], HYPERPARAMS["BETA_2"])
+    else:
+        betas = None
 
     match HYPERPARAMS["OPTIMIZER"]:
         case "AdamW":
             optimizer = torch.optim.AdamW(
                 model.parameters(),
                 lr=HYPERPARAMS["LEARNING_RATE"],
-                betas=(HYPERPARAMS["BETA_1"], HYPERPARAMS["BETA_2"]),
+                betas=betas,
                 weight_decay=HYPERPARAMS["WEIGHT_DECAY"],
                 maximize=False,
             )
@@ -148,22 +164,26 @@ def calculate_val_loss(
         )
 
         # Validate the model
-        val_losses.append(
-            _do_eval(
+        val_avg_loss, _, _ = _do_eval(
                 model=model,
                 criterion=criterion,
                 dataloader=val_loader,
                 transformation_pipeline=transformation_pipeline,
-            )[0]
+            )
+
+        val_losses.append(
+            val_avg_loss
         )
 
-        test_losses.append(
-            _do_eval(
+        test_avg_loss, _, _ = _do_eval(
                 model=model,
                 criterion=criterion,
                 dataloader=test_loader,
                 transformation_pipeline=transformation_pipeline,
-            )[0]
+            )
+
+        test_losses.append(
+            test_avg_loss
         )
 
         match HYPERPARAMS["SCHEDULER"]:
@@ -175,7 +195,6 @@ def calculate_val_loss(
         # clear cell in case this is run in a jupyter notebook
         clear_output(wait=True)
         plot_loss(train_losses, val_losses, test_losses)
-
         # Early Stopping Check
         if val_losses[-1] < best_loss:
             best_loss = val_losses[-1]
@@ -186,6 +205,9 @@ def calculate_val_loss(
             epochs_without_improvement += 1
             if epochs_without_improvement >= HYPERPARAMS["PATIENCE"]:
                 break
+
+        if trial:
+            trial.report(val_losses[-1], step=epoch)
 
     # Load the best model weights
     # model.load_state_dict(best_model_weights)
@@ -228,11 +250,23 @@ def _do_eval(
     criterion: torch.nn.CrossEntropyLoss,
     dataloader: torch.utils.data.DataLoader,
     transformation_pipeline: Callable,
-) -> tuple[float, float]:
+) -> tuple[float, float, dict]:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
-    correct = 0
+    # correct = 0
     total = 0
+
+    TP = (1, 1)
+    TN = (0, 0)
+    FP = (1, 0)
+    FN = (0, 1)
+
+    metrics = {
+        TP: 0,
+        TN: 0,
+        FP: 0,
+        FN: 0
+    }
 
     with torch.no_grad():
         for features, labels in dataloader:
@@ -245,9 +279,16 @@ def _do_eval(
 
             # Calculate predictions and compare to labels
             _, predicted = torch.max(outputs, 1)
-            correct += (predicted == labels).sum().item()
+
+            for predited, actual in list(zip(predicted.tolist(), labels.tolist())):
+                metrics[(predited, actual)] += 1
+
+            # correct += (predicted == labels).sum().item()
             total += labels.size(0)
 
     avg_loss = validation_loss / len(dataloader)
+
+    correct = metrics[TP] + metrics[TN]
+
     accuracy = correct / total if total > 0 else 0.0
-    return avg_loss, accuracy
+    return avg_loss, accuracy, metrics

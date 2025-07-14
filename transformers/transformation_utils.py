@@ -1,22 +1,28 @@
 from typing import Callable, Union, List
-from copy import deepcopy
 from functools import reduce
 import optuna
 from torchvision import transforms
-from torchvision.transforms import InterpolationMode
-from torchvision.transforms import AugMix, Compose
+from torchvision.transforms import AugMix, Compose, InterpolationMode
 from transformers.fourier_transformer import FourierTransformer
 from transformers.jigsaw_transformer import JigsawTransform
-from transformers.style_transformer import StyleTransformer
 from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 
 
 def get_transform_pipeline(params: dict) -> Callable:
-    collect = []
     transformations = []
-    for fn in params["TRANSFORMATIONS_ORDER"].split(","):
+
+    transformations.append(
+        Compose([
+            transforms.Resize((227,227))
+        ])
+    )
+
+    transformation_order = params["TRANSFORMATIONS_ORDER"]
+    if len(transformation_order) > 0:
+        transformation_order = tuple(transformation_order.split(","))
+
+    for fn in transformation_order:
         if fn == "Augmix" and params["USE_AUGMIX"]:
-            collect.append(fn)
 
             class ScaleTo255:
                 def __call__(self, x):
@@ -25,11 +31,6 @@ def get_transform_pipeline(params: dict) -> Callable:
             class Normalize:
                 def __call__(self, x):
                     return x / 255.0
-
-            if params["INTERPOLATION"] == "NEAREST":
-                interpolation = InterpolationMode.NEAREST
-            elif params["INTERPOLATION"] == "BILINEAR":
-                interpolation = InterpolationMode.BILINEAR
 
             augmix = Compose(
                 [
@@ -40,7 +41,7 @@ def get_transform_pipeline(params: dict) -> Callable:
                         chain_depth=params["CHAIN_DEPTH"],
                         alpha=params["ALPHA"],
                         all_ops=params["ALL_OPS"],
-                        interpolation=interpolation,
+                        interpolation=InterpolationMode.BILINEAR if  params["INTERPOLATION"] == "bilinear" else InterpolationMode.NEAREST,
                     ),
                     Normalize(),
                 ]
@@ -48,18 +49,22 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(augmix)
 
         elif fn == "Fourier" and params["USE_FOURIER"]:
-            collect.append(fn)
+            if "SQUARE_SIZE_SINGLE_SIDE" in params:
+                square_size = params["SQUARE_SIZE_SINGLE_SIDE"]
+            elif "SQUARE_SIZE" in params:
+                square_size = params["SQUARE_SIZE"]
+            else:
+                square_size = None
             fourier = transforms.Compose(
                 [
                     FourierTransformer(
-                        square_size=params["SQUARE_SIZE"], eta=params["ETA"]
+                        square_size=square_size, eta=params["ETA"]
                     )
                 ]
             )
             transformations.append(fourier)
 
-        elif fn == "Jigsaw" and params["USE_JIGSAW"]:
-            collect.append(fn)
+        elif fn == "Jigsaw" == params["USE_JIGSAW"]:
             jigsaw = transforms.Compose(
                 [
                     JigsawTransform(
@@ -71,15 +76,11 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(jigsaw)
 
         elif fn == "Dlow" and params["USE_DLOW"]:
-            collect.append(fn)
-            style_transform = transforms.Compose(
-                [StyleTransformer("dlow/checkpoints/", params["TARGET_DOMAIN"])]
-            )
-            transformations.append(style_transform)
+            # TODO: add the 4th transformation here once it is done
+            pass
 
-    print("setup pipeline with transformations:", collect)
+    # no transformations are activated
     if not transformations:
-        # no transformations are activated
         return lambda x: x
     else:
-        return lambda x: reduce(lambda acc, t: t(acc), transformations, deepcopy(x))
+        return lambda x: reduce(lambda acc, t: t(acc), transformations, x)
