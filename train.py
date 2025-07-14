@@ -33,7 +33,7 @@ def start_training(target_domain: str, model_name: str, pretrained: bool, params
     )
 
 
-study_dir = os.path.join(os.environ.get("TMPDIR"), "studies_copy")
+study_dir = os.path.join(os.environ.get("TMPDIR"), "studies")
 studies = os.listdir(study_dir)
 pattern = r"STUDY_(ResNet\d+)_([0-3])_pretrained_(True|False)_transformations_(True|False)"
 
