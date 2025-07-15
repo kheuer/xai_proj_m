@@ -30,3 +30,24 @@ Augmentations = True
 tune for all 4 hyperparam combinations and compare losses
 
 use new dataset
+
+
+## train on camelyon
+```
+project
+├── camelyon17
+│   ├── data
+│   │   └── camelyon17_v1.0
+│   │       ├── metadata.csv
+│   │       ├── patches
+│   │       └── RELEASE_v1.0.txt
+│   └── src
+│       └── BigQuery_Helper
+│           ├── bq_helper
+│           ├── bq_helper.egg-info
+│           ├── LICENSE
+│           ├── README.md
+│           ├── setup.py
+│           └── version.py
+...
+```
