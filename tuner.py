@@ -195,7 +195,7 @@ def write_callback(study, trial):
 if __name__ == "__main__":
     # Optimize the study using objective function
     os.makedirs("trials", exist_ok=True)
-    storage_uri = f"sqlite:///trials/{STUDY_NAME}.db"
+    storage_uri = f"sqlite:///{STUDY_NAME}.db"
 
     study = optuna.create_study(
         direction="minimize",
