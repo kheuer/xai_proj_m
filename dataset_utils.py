@@ -144,7 +144,7 @@ def get_dataloader(
         labels.append(row["labels"])
 
     # Convert lists to tensors
-    images_tensor = torch.cat(images).to(device)
+    images_tensor = torch.cat(images).to(device)[:, :3, :, :]  # keep only RGB channels
 
     labels_tensor = torch.tensor(labels, dtype=torch.long).to(device)
 

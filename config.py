@@ -1,6 +1,8 @@
 MAX_EPOCHS = 300
 PATIENCE = 25
 BATCH_SIZE = 32
+NUM_TRIALS = 100
+SAVE_FREQ = 1
 
 params_resnet_18_random = {
     "EPOCHS": MAX_EPOCHS,

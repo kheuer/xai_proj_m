@@ -20,9 +20,9 @@ def start_training(target_domain: str, model_name: str, pretrained: bool, params
     )
 
     if model_name == "ResNet18":
-        model = get_resnet_18(pretrained=pretrained)
+        model = get_resnet_18(pretrained=pretrained, dataset_name=dataset_name)
     else:
-        model = get_resnet_50(pretrained=pretrained)
+        model = get_resnet_50(pretrained=pretrained, dataset_name=dataset_name)
 
     return calculate_val_loss(
         train_loader=train_loader,
