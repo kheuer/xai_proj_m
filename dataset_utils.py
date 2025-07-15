@@ -4,12 +4,14 @@ This module creates the DataFrames, import them from here.
 
 import random
 import os
+import itertools
 from typing import Union
 from PIL import Image
 import numpy as np
 import pandas as pd
 from datasets import Dataset
 from torchvision import transforms
+from torchvision.transforms import Compose
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from cuda import device
@@ -67,14 +69,65 @@ pacs_df = pd.DataFrame(builder)
 pacs_classes = pacs_df["labels"].unique().tolist()
 pacs_df["labels"] = pacs_df["labels"].map(lambda x: pacs_classes.index(x))
 
+
+# Build the Camelyon Dataframe
+
+path = os.path.join(
+    os.environ.get("TMPDIR", ""), "camelyon17/data/camelyon17_v1.0/metadata.csv"
+)
+df = pd.read_csv(path)
+total_images = 10000
+TUMOR, NO_TUMOR = 1, 0
+categories = [TUMOR, NO_TUMOR]
+nodes = [0, 1, 2, 3]
+combinations = list(itertools.product(categories, nodes))
+imgs_per_combination = total_images // len(combinations)
+selected_rows = []
+pre_path = os.path.join(
+    os.environ.get("TMPDIR", ""), "camelyon17/data/camelyon17_v1.0/patches"
+)
+
+builder = {"labels": [], "image": [], "domain": []}
+
+for category, node in combinations:
+    tmp = df[(df["tumor"] == category) & (df["node"] == node)].head(
+        imgs_per_combination
+    )
+    for index, row in tmp.iterrows():
+        patient = row["patient"]
+        x = row["x_coord"]
+        y = row["y_coord"]
+        num = row["Unnamed: 0"]
+        img_path = os.path.join(
+            pre_path,
+            f"patient_{str(patient).zfill(3)}_node_{node}",
+            f"patch_patient_{str(patient).zfill(3)}_node_{node}_x_{x}_y_{y}.png",
+        )
+        builder["labels"].append(category)
+        builder["domain"].append(str(node))
+        builder["image"].append(img_path)
+
+camelyon_df = pd.DataFrame(builder)
+camelyon_classes = camelyon_df["labels"].unique().tolist()
+camelyon_df["labels"] = camelyon_df["labels"].map(lambda x: camelyon_classes.index(x))
+
+
 all_datasets = {
     "pacs": {
         "df": pacs_df,
         "classes": pacs_classes,
         "domains": list(pacs_df["domain"].unique()),
         "shape": (3, 227, 227),
-    }
+    },
+    "camelyon": {
+        "df": camelyon_df,
+        "classes": camelyon_classes,
+        "domains": list(camelyon_df["domain"].unique()),
+        "shape": (4, 227, 227),
+    },
 }
+
+resizer = Compose([transforms.Resize((227, 227))])
 
 
 def get_dataloader(
@@ -86,7 +139,7 @@ def get_dataloader(
     labels = []
     for index, row in df.iterrows():
         images.append(
-            load_image(row["image"], move_to_device=False)
+            resizer(load_image(row["image"], move_to_device=False))
         )  # Do not move to device yet
         labels.append(row["labels"])
 

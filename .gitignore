@@ -184,4 +184,6 @@ output_images
 *.pth
 *.tar.gz
 final_results.txt
+*.csv
 *.ipynb
+/camelyon17/

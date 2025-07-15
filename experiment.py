@@ -29,9 +29,9 @@ print(
 losses = []
 while True:
     if model_name == "ResNet18":
-        model = get_resnet_18(pretrained=pretrained)
+        model = get_resnet_18(pretrained=pretrained, dataset_name=dataset_name)
     elif model_name == "ResNet50":
-        model = get_resnet_50(pretrained=pretrained)
+        model = get_resnet_50(pretrained=pretrained, dataset_name=dataset_name)
     losses.append(
         calculate_val_loss(
             train_loader=train_loader,

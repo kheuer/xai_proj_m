@@ -10,7 +10,8 @@ from utils import split_df_into_loaders
 from cuda import device
 from torch.cuda import empty_cache
 
-dataset = all_datasets["pacs"]
+dataset_name = "pacs"
+dataset = all_datasets[dataset_name]
 
 builder = {
     "taget_domain": [],
@@ -34,9 +35,9 @@ def main():
         pretrained = pretrained.startswith("True")
         augmented = augmented.startswith("True")
         if architecture == "ResNet18":
-            model = get_resnet_18(pretrained=False)
+            model = get_resnet_18(pretrained=False, dataset_name=dataset_name)
         else:
-            model = get_resnet_50(pretrained=False)
+            model = get_resnet_50(pretrained=False, dataset_name=dataset_name)
 
         state_dict = load(os.path.join("weights", filename), map_location=device)
         model.load_state_dict(state_dict)

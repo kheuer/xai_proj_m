@@ -14,7 +14,12 @@ from config import MAX_EPOCHS, BATCH_SIZE, PATIENCE
 def get_transform_pipeline(params: dict) -> Callable:
     collect = []
     transformations = []
-    for fn in params["TRANSFORMATIONS_ORDER"].split(","):
+
+    transformation_order = params["TRANSFORMATIONS_ORDER"]
+    if len(transformation_order) > 0:
+        transformation_order = tuple(transformation_order.split(","))
+
+    for fn in transformation_order:
         if fn == "Augmix" and params["USE_AUGMIX"]:
             collect.append(fn)
 
@@ -40,7 +45,11 @@ def get_transform_pipeline(params: dict) -> Callable:
                         chain_depth=params["CHAIN_DEPTH"],
                         alpha=params["ALPHA"],
                         all_ops=params["ALL_OPS"],
-                        interpolation=interpolation,
+                        interpolation=(
+                            InterpolationMode.BILINEAR
+                            if params["INTERPOLATION"] == "bilinear"
+                            else InterpolationMode.NEAREST
+                        ),
                     ),
                     Normalize(),
                 ]
@@ -48,13 +57,14 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(augmix)
 
         elif fn == "Fourier" and params["USE_FOURIER"]:
-            collect.append(fn)
+            if "SQUARE_SIZE_SINGLE_SIDE" in params:
+                square_size = params["SQUARE_SIZE_SINGLE_SIDE"]
+            elif "SQUARE_SIZE" in params:
+                square_size = params["SQUARE_SIZE"]
+            else:
+                square_size = None
             fourier = transforms.Compose(
-                [
-                    FourierTransformer(
-                        square_size=params["SQUARE_SIZE"], eta=params["ETA"]
-                    )
-                ]
+                [FourierTransformer(square_size=square_size, eta=params["ETA"])]
             )
             transformations.append(fourier)
 

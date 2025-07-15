@@ -97,10 +97,10 @@ for augmented, model_name, pretrained, target_domain in tqdm(
             continue
 
         if model_name == "ResNet18":
-            model = get_resnet_18(pretrained=pretrained)
+            model = get_resnet_18(pretrained=pretrained, dataset_name=dataset_name)
             name = "resnet_18"
         elif model_name == "ResNet50":
-            model = get_resnet_50(pretrained=pretrained)
+            model = get_resnet_50(pretrained=pretrained, dataset_name=dataset_name)
             name = "resnet_50"
 
         variable_name = f"params_{name}_{'pretrained' if pretrained else 'random'}"
