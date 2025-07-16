@@ -17,10 +17,16 @@ from models import (
 from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE, NUM_TRIALS, SAVE_FREQ
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model", required=False, type=str, choices=["ResNet18", "ResNet50"])
+parser.add_argument(
+    "--model", required=False, type=str, choices=["ResNet18", "ResNet50"]
+)
 parser.add_argument("--pretrained", required=False, type=str, choices=["True", "False"])
-parser.add_argument("--transformations", required=False, type=str, choices=["True", "False"])
-parser.add_argument("--targetdomain", required=False, type=str, choices=["0","1","2","3"])
+parser.add_argument(
+    "--transformations", required=False, type=str, choices=["True", "False"]
+)
+parser.add_argument(
+    "--targetdomain", required=False, type=str, choices=["0", "1", "2", "3"]
+)
 parser.add_argument("--dataset", required=False, type=str, choices=["pacs", "camelyon"])
 args = parser.parse_args()
 print(args)
@@ -57,7 +63,9 @@ if args.targetdomain is not None:
 # take a random sample to speed up training
 _, df_sampled = split_df(dataset["df"], test_size=0.2)
 
-train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled, target_domain)
+train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(
+    df_sampled, target_domain
+)
 
 STUDY_NAME = f"STUDY_{dataset_name}_{model_name}_{target_domain}_pretrained_{pretrained}_transformations_{transformations}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 
@@ -149,7 +157,7 @@ def objective_transformations(trial: optuna.trial.Trial):
         "ETA": trial.suggest_float("ETA", 0, 1),
         # Jigsaw params
         "USE_JIGSAW": trial.suggest_categorical("USE_JIGSAW", [True, False]),
-        "MIN_GRID_SIZE": trial.suggest_int("MIN_GRID_SIZE", 2, 6),
+        "MIN_GRID_SIZE": trial.suggest_int("MIN_GRID_SIZE", 2, 5),
         "MAX_GRID_SIZE": trial.suggest_int("MAX_GRID_SIZE", 6, 15),
         # Dlow params
         "USE_DLOW": False,
@@ -219,7 +227,9 @@ def write_callback(study, trial):
 if __name__ == "__main__":
     # Optimize the study using objective function
     os.makedirs("trials", exist_ok=True)
-    storage_path = os.path.join(os.environ.get("TMPDIR", ""), "trials", STUDY_NAME + ".db")
+    storage_path = os.path.join(
+        os.environ.get("TMPDIR", ""), "trials", STUDY_NAME + ".db"
+    )
     storage_uri = f"sqlite:///{storage_path}"
 
     study = optuna.create_study(
