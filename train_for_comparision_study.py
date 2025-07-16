@@ -116,7 +116,9 @@ for i, model_name, (augmentation_desc, augmentation_params), target_domain in tq
     total=(len(indices) * len(model_names) * len(params_list) * len(target_domains)),
     desc="Running combinations",
 ):
-    SAVE_PATH = f"{dataset_name}_{model_name}_{augmentation_desc}_{i}.pth"
+    SAVE_PATH = (
+        f"{dataset_name}_{model_name}_{augmentation_desc}_{target_domain}_{i}.pth"
+    )
     if SAVE_PATH in os.listdir("weights"):
         print("skip", SAVE_PATH)
         continue
