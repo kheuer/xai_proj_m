@@ -11,12 +11,12 @@ module add python
 conda activate xAI-Proj
 
 tar xf "$WORK/camelyon17.tar.gz" -C "$TMPDIR"
-cp "$WORK/xai_proj_m/resnet18.pth" "$TMPDIR"
-cp -r "$WORK/studies" "$TMPDIR"
+#cp "$WORK/xai_proj_m/resnet18.pth" "$TMPDIR"
+#cp -r "$WORK/studies" "$TMPDIR"
 #copy .tar to local ssd and unzip is done in script
 #copy only checkpoints to $work during running
-python3 /home/woody/barz/barz129h/xai_proj_m/train.py
-#/home/woody/barz/barz129h/xai_proj_m/jobs.sh
+#python3 /home/woody/barz/barz129h/xai_proj_m/train.py
+/home/woody/barz/barz129h/xai_proj_m/jobs.sh
 
 cp -r "$TMPDIR/trials" "$WORK"
-cp -r "$TMPDIR/studies" "$WORK"
+#cp -r "$TMPDIR/studies" "$WORK"
