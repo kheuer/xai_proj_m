@@ -31,7 +31,7 @@ def start_training(target_domain: str, model_name: str, pretrained: bool, params
 
     if model_name == "ResNet18":
         model = get_resnet_18(pretrained=pretrained, dataset_name=dataset_name)
-    else:
+    elif model_name == "ResNet50":
         model = get_resnet_50(pretrained=pretrained, dataset_name=dataset_name)
 
     return calculate_val_loss(
@@ -140,6 +140,8 @@ for i, model_name, (augmentation_desc, augmentation_params), target_domain in tq
     builder["test_loss"].append(loss)
     builder["model_name"].append(model_name)
     builder["target_domain"].append(target_domain)
+
+    del weights
 
 builder["dataset_name"] = dataset_name
 df = pd.DataFrame(builder)
