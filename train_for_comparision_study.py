@@ -134,7 +134,7 @@ for i, model_name, (augmentation_desc, augmentation_params), target_domain in tq
         pretrained=False,
         params=params,
     )
-    torch.save(weights, SAVE_PATH)
+    torch.save(weights, os.path.join("weights", SAVE_PATH))
     print("loss", loss, "accuracy", accuracy)
     builder["test_accuracy"].append(accuracy)
     builder["test_loss"].append(loss)
