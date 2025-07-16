@@ -13,7 +13,13 @@ from dataset_utils import all_datasets
 from models import get_resnet_18, get_resnet_50, calculate_val_loss
 from utils import split_df_into_loaders
 
-dataset_name = "pacs"
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--dataset_name", required=False, type=str, choices=["pacs", "camelyon"]
+)
+
+args = parser.parse_args()
+dataset_name = args.dataset_name
 
 
 def start_training(target_domain: str, model_name: str, pretrained: bool, params):
@@ -101,33 +107,36 @@ builder = {
     "target_domain": [],
 }
 
-for model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
-    product(model_names, params_list, target_domains),
-    total=(len(model_names) * len(params_list) * len(target_domains)),
+indices = tuple(range(4))
+
+
+for model_name, (augmentation_desc, augmentation_params), target_domain, i in tqdm(
+    product(model_names, params_list, target_domains, indices),
+    total=(len(model_names) * len(params_list) * len(target_domains) * len(indices)),
     desc="Running combinations",
 ):
+    SAVE_PATH = f"{dataset_name}_{model_name}_{augmentation_desc}_{i}.pth"
+    if SAVE_PATH in os.listdir("weights"):
+        print("skip", SAVE_PATH)
+        continue
+    print(SAVE_PATH)
+
     params = deepcopy(DEFAULT_PARAMS)
     params.update(augmentation_params)
     params["TARGET_DOMAIN"] = target_domain
 
-    for i in range(4):
-        SAVE_PATH = f"{dataset_name}_{model_name}_{augmentation_desc}_{i}.pth"
-        if SAVE_PATH in os.listdir("weights"):
-            print("skip", SAVE_PATH)
-            continue
-        print(SAVE_PATH)
-        loss, accuracy, weights = start_training(
-            target_domain=target_domain,
-            model_name=model_name,
-            pretrained=False,
-            params=params,
-        )
-        torch.save(weights, SAVE_PATH)
-        print("loss", loss, "accuracy", accuracy)
-        builder["test_accuracy"].append(accuracy)
-        builder["test_loss"].append(loss)
-        builder["model_name"].append(model_name)
-        builder["target_domain"].append(target_domain)
+    loss, accuracy, weights = start_training(
+        target_domain=target_domain,
+        model_name=model_name,
+        pretrained=False,
+        params=params,
+    )
+    torch.save(weights, SAVE_PATH)
+    print("loss", loss, "accuracy", accuracy)
+    builder["test_accuracy"].append(accuracy)
+    builder["test_loss"].append(loss)
+    builder["model_name"].append(model_name)
+    builder["target_domain"].append(target_domain)
 
 builder["dataset_name"] = dataset_name
 df = pd.DataFrame(builder)
