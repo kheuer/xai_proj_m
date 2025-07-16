@@ -115,7 +115,7 @@ for model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
 ):
     params = deepcopy(DEFAULT_PARAMS)
     params.update(augmentation_params)
-    params["target_domain"] = target_domain
+    params["TARGET_DOMAIN"] = target_domain
 
     for i in range(4):
         SAVE_PATH = f"{dataset_name}_{model_name}_{augmentation_desc}_{i}.pth"
