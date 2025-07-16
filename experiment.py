@@ -39,7 +39,7 @@ while True:
             val_loader=val_loader,
             model=model,
             HYPERPARAMS=params,
-        )
+        )[0]
     )
 
     print(

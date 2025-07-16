@@ -30,8 +30,7 @@ def start_training(target_domain: str, model_name: str, pretrained: bool, params
         val_loader=val_loader,
         model=model,
         HYPERPARAMS=params,
-        return_best_weights=True,
-    )
+    )[0]
 
 
 study_dir = os.path.join(os.environ.get("TMPDIR"), "studies")

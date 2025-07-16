@@ -109,7 +109,7 @@ def objective_simple(trial: optuna.trial.Trial):
         model=model,
         HYPERPARAMS=params,
         trial=trial,
-    )
+    )[0]
 
     if trial.number % SAVE_FREQ == 0:
         save_path = os.path.join("trials", f"{STUDY_NAME}.db")
@@ -190,7 +190,7 @@ def objective_transformations(trial: optuna.trial.Trial):
         model=model,
         HYPERPARAMS=params,
         trial=trial,
-    )
+    )[0]
 
     return loss
 

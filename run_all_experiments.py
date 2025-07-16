@@ -110,13 +110,12 @@ for augmented, model_name, pretrained, target_domain in tqdm(
         params = deepcopy(globals().get(variable_name))
         params["TARGET_DOMAIN"] = target_domain
 
-        _, weights = calculate_val_loss(
+        _, _, weights = calculate_val_loss(
             train_loader=train_loader,
             test_loader=test_loader,
             val_loader=val_loader,
             model=model,
             HYPERPARAMS=params,
-            return_best_weights=True,
         )
 
         loss, accuracy = _do_eval(

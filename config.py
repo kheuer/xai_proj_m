@@ -4,6 +4,22 @@ BATCH_SIZE = 32
 NUM_TRIALS = 100
 SAVE_FREQ = 1
 
+DEFAULT_PARAMS = {
+    "EPOCHS": MAX_EPOCHS,
+    "PATIENCE": PATIENCE,
+    "BATCH_SIZE": BATCH_SIZE,
+    "LEARNING_RATE": 0.001,
+    "BETA_1": 0.9,
+    "BETA_2": 0.999,
+    "OPTIMIZER": "SGD",
+    "SCHEDULER": "CosineAnnealingLR",
+    "MOMENTUM": 0.53,
+    "DAMPENING": 0.0145,
+    "WEIGHT_DECAY": 0.0,
+    # augmentation params
+    "TRANSFORMATIONS_ORDER": [],
+}
+
 params_resnet_18_random = {
     "EPOCHS": MAX_EPOCHS,
     "PATIENCE": PATIENCE,
