@@ -16,24 +16,48 @@ from models import (
 )
 from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE, NUM_TRIALS, SAVE_FREQ
 
-model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
-pretrained = {"Yes": True, "No": False}[
-    get_expected_input("Use pre-trained weights? ", ("Yes", "No"))
-]
+parser = argparse.ArgumentParser()
+parser.add_argument("--model", required=False, type=str, choices=["ResNet18", "ResNet50"])
+parser.add_argument("--pretrained", required=False, type=str, choices=["True", "False"])
+parser.add_argument("--transformations", required=False, type=str, choices=["True", "False"])
+parser.add_argument("--targetdomain", required=False, type=str, choices=["0","1","2","3"])
+parser.add_argument("--dataset", required=False, type=str, choices=["pacs", "camelyon"])
+args = parser.parse_args()
+print(args)
+if args.model is not None:
+    model_name = args.model
+else:
+    model_name = get_expected_input("Please choose a model:", ("ResNet18", "ResNet50"))
 
-dataset_name = get_expected_input(
-    "Which dataset should be used? ", ("pacs", "camelyon")
-)
+if args.pretrained is not None:
+    pretrained = True if args.pretrained == "True" else False
+else:
+    pretrained = {"Yes": True, "No": False}[
+        get_expected_input("Use pre-trained weights? ", ("Yes", "No"))
+    ]
+
+if args.dataset is not None:
+    dataset_name = args.dataset
+else:
+    dataset_name = get_expected_input(
+        "Which dataset should be used? ", ("pacs", "camelyon")
+    )
 dataset = all_datasets[dataset_name]
 
-transformations = {"Yes": True, "No": False}[
-    get_expected_input("Apply transformations during training? ", ("Yes", "No"))
-]
+if args.transformations is not None:
+    transformations = True if args.transformations == "True" else False
+else:
+    transformations = {"Yes": True, "No": False}[
+        get_expected_input("Apply transformations during training? ", ("Yes", "No"))
+    ]
+target_domain = None
+if args.targetdomain is not None:
+    target_domain = args.targetdomain
 
 # take a random sample to speed up training
 _, df_sampled = split_df(dataset["df"], test_size=0.2)
 
-train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled)
+train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(df_sampled, target_domain)
 
 STUDY_NAME = f"STUDY_{dataset_name}_{model_name}_{target_domain}_pretrained_{pretrained}_transformations_{transformations}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}"
 
