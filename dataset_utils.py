@@ -71,15 +71,22 @@ elif dataset == "camelyon":
     df = pd.read_csv(path)
     total_images = 10000
     TUMOR, NO_TUMOR = 1, 0
+
+    tumor_to_no_tumor_ratio = 0.02
     categories = [TUMOR, NO_TUMOR]
     nodes = [0, 1, 2, 3]
     combinations = list(itertools.product(categories, nodes))
+    imgs_per_node = total_images // len(nodes)
+    ratio_imgs_for_combination = [tumor_to_no_tumor_ratio if tumor == 1 else 1 - tumor_to_no_tumor_ratio for tumor, _ in combinations]
+
+
     imgs_per_combination = total_images // len(combinations)
     selected_rows = []
     pre_path = os.path.join(os.environ.get("TMPDIR"), "camelyon17/data/camelyon17_v1.0/patches")
 
-    for category, node in combinations:
-        tmp = df[(df["tumor"] == category) & (df["node"] == node)].head(imgs_per_combination)
+    for ratio, (category, node) in zip(ratio_imgs_for_combination, combinations):
+        print(f"category: {category} on node: {node}, num_imgages: {int(ratio * imgs_per_node)}")
+        tmp = df[(df["tumor"] == category) & (df["node"] == node)].head(int(ratio * imgs_per_node))
         for index, row in tmp.iterrows():
             patient = row["patient"]
             x = row["x_coord"]
@@ -99,7 +106,6 @@ elif dataset == "camelyon":
 pacs_df = pd.DataFrame(builder)
 pacs_classes = pacs_df["labels"].unique().tolist()
 pacs_df["labels"] = pacs_df["labels"].map(lambda x: pacs_classes.index(x))
-
 
 all_datasets = {
     "pacs": {

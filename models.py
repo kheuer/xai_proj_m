@@ -250,23 +250,13 @@ def _do_eval(
     criterion: torch.nn.CrossEntropyLoss,
     dataloader: torch.utils.data.DataLoader,
     transformation_pipeline: Callable,
-) -> tuple[float, float, dict]:
+) -> tuple[float, float, np.array, np.array]:
     model.eval()  # Switch to evaluation mode
     validation_loss = 0.0
-    # correct = 0
+    correct = 0
     total = 0
-
-    TP = (1, 1)
-    TN = (0, 0)
-    FP = (1, 0)
-    FN = (0, 1)
-
-    metrics = {
-        TP: 0,
-        TN: 0,
-        FP: 0,
-        FN: 0
-    }
+    all_probabilities = []
+    all_labels = []
 
     with torch.no_grad():
         for features, labels in dataloader:
@@ -277,18 +267,14 @@ def _do_eval(
             loss = criterion(outputs, labels)
             validation_loss += loss.item()
 
+            all_labels.append(np.array(labels.detach().cpu()))
+            all_probabilities.append(np.array(outputs.detach().cpu()))
+
             # Calculate predictions and compare to labels
             _, predicted = torch.max(outputs, 1)
-
-            for predited, actual in list(zip(predicted.tolist(), labels.tolist())):
-                metrics[(predited, actual)] += 1
-
-            # correct += (predicted == labels).sum().item()
             total += labels.size(0)
+            correct += (predicted == labels).sum().item()
 
     avg_loss = validation_loss / len(dataloader)
-
-    correct = metrics[TP] + metrics[TN]
-
     accuracy = correct / total if total > 0 else 0.0
-    return avg_loss, accuracy, metrics
+    return avg_loss, accuracy, np.concat(all_probabilities, axis=0), np.concatenate(all_labels, axis=0)
