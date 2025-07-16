@@ -113,14 +113,6 @@ for model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
     total=(len(model_names) * len(params_list) * len(target_domains)),
     desc="Running combinations",
 ):
-    print(
-        "model_name:",
-        model_name,
-        "target-domain:",
-        target_domain,
-        "dataset_name",
-        dataset_name,
-    )
     params = deepcopy(DEFAULT_PARAMS)
     params.update(augmentation_params)
     params["target_domain"] = target_domain
@@ -128,7 +120,9 @@ for model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
     for i in range(4):
         SAVE_PATH = f"{dataset_name}_{model_name}_{augmentation_desc}_{i}.pth"
         if SAVE_PATH in os.listdir("weights"):
+            print("skip", SAVE_PATH)
             continue
+        print(SAVE_PATH)
         loss, accuracy, weights = start_training(
             target_domain=target_domain,
             model_name=model_name,

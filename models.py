@@ -282,6 +282,6 @@ def _do_eval(
     return (
         avg_loss,
         accuracy,
-        np.concat(all_probabilities, axis=0),
+        np.concatenate(all_probabilities, axis=0),
         np.concatenate(all_labels, axis=0),
     )
