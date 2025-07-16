@@ -13,14 +13,7 @@ from dataset_utils import all_datasets
 from models import get_resnet_18, get_resnet_50, calculate_val_loss
 from utils import split_df_into_loaders
 
-
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--dataset_name", required=False, type=str, choices=["pacs", "camelyon"]
-)
-
-args = parser.parse_args()
-dataset_name = args.dataset_name
+dataset_name = "pacs"
 
 
 def start_training(target_domain: str, model_name: str, pretrained: bool, params):
@@ -77,7 +70,7 @@ params_list = [
     ),
     (
         "Dlow",
-        DEFAULT_PARAMS.update({"USE_DLOW": True, "target_domain": None}),
+        {"USE_DLOW": True, "target_domain": None},
     ),
     (
         "Augmix and Fourier",
