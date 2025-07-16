@@ -20,7 +20,7 @@ def get_transform_pipeline(params: dict) -> Callable:
         transformation_order = tuple(transformation_order.split(","))
 
     for fn in transformation_order:
-        if fn == "Augmix" and params["USE_AUGMIX"]:
+        if fn == "Augmix" and params.get("USE_AUGMIX"):
             collect.append(fn)
 
             class ScaleTo255:
@@ -56,7 +56,7 @@ def get_transform_pipeline(params: dict) -> Callable:
             )
             transformations.append(augmix)
 
-        elif fn == "Fourier" and params["USE_FOURIER"]:
+        elif fn == "Fourier" and params.get("USE_FOURIER"):
             if "SQUARE_SIZE_SINGLE_SIDE" in params:
                 square_size = params["SQUARE_SIZE_SINGLE_SIDE"]
             elif "SQUARE_SIZE" in params:
@@ -68,7 +68,7 @@ def get_transform_pipeline(params: dict) -> Callable:
             )
             transformations.append(fourier)
 
-        elif fn == "Jigsaw" and params["USE_JIGSAW"]:
+        elif fn == "Jigsaw" and params.get("USE_JIGSAW"):
             collect.append(fn)
             jigsaw = transforms.Compose(
                 [
@@ -80,7 +80,7 @@ def get_transform_pipeline(params: dict) -> Callable:
             )
             transformations.append(jigsaw)
 
-        elif fn == "Dlow" and params["USE_DLOW"]:
+        elif fn == "Dlow" and params.get("USE_DLOW"):
             collect.append(fn)
             style_transform = transforms.Compose(
                 [StyleTransformer("dlow/checkpoints/", params["TARGET_DOMAIN"])]
