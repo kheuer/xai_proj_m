@@ -17,7 +17,7 @@ DEFAULT_PARAMS = {
     "DAMPENING": 0.0145,
     "WEIGHT_DECAY": 0.0,
     # augmentation params
-    "TRANSFORMATIONS_ORDER": [],
+    "TRANSFORMATIONS_ORDER": "Augmix,Dlow,Fourier,Jigsaw",
 }
 
 params_resnet_18_random = {
