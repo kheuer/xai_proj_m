@@ -110,7 +110,7 @@ builder = {
 
 indices = tuple(range(4))
 
-
+os.makedirs("weights", exist_ok=True)
 for i, model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
     product(indices, model_names, params_list, target_domains),
     total=(len(indices) * len(model_names) * len(params_list) * len(target_domains)),
