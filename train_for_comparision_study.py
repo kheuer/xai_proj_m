@@ -121,15 +121,14 @@ for model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
         "dataset_name",
         dataset_name,
     )
-    SAVE_PATH = f"{dataset_name}_{model_name}_{augmentation_desc}_{i}.pth"
     params = deepcopy(DEFAULT_PARAMS)
     params.update(augmentation_params)
     params["target_domain"] = target_domain
 
-    if SAVE_PATH in os.listdir("weights"):
-        continue
-
     for i in range(4):
+        SAVE_PATH = f"{dataset_name}_{model_name}_{augmentation_desc}_{i}.pth"
+        if SAVE_PATH in os.listdir("weights"):
+            continue
         loss, accuracy, weights = start_training(
             target_domain=target_domain,
             model_name=model_name,
