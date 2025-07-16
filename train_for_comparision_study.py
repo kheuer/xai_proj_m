@@ -50,6 +50,7 @@ elif dataset_name == "camelyon":
     target_domains = ["0", "1", "2", "3"]
 
 params_list = [
+    ("No Augmentations", {}),
     (
         "Augmix",
         {
