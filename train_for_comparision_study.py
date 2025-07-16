@@ -1,6 +1,7 @@
 import os.path
 import json
 import re
+import gc
 from copy import deepcopy
 import argparse
 from itertools import product
@@ -142,6 +143,8 @@ for i, model_name, (augmentation_desc, augmentation_params), target_domain in tq
     builder["target_domain"].append(target_domain)
 
     del weights
+    gc.collect()
+    torch.cuda.empty_cache()
 
 builder["dataset_name"] = dataset_name
 df = pd.DataFrame(builder)
