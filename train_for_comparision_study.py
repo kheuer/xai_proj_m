@@ -49,6 +49,8 @@ if dataset_name == "pacs":
     target_domains = ["art_painting", "cartoon", "photo", "sketch"]
 elif dataset_name == "camelyon":
     target_domains = ["0", "1", "2", "3"]
+else:
+    raise ValueError(f"invalid dataset_name: {dataset_name}")
 
 params_list = [
     ("No Augmentations", {}),
@@ -102,52 +104,41 @@ params_list = [
 if dataset_name == "camelyon":
     params_list = [x for x in params_list if x[0] != "Dlow"]
 
-builder = {
-    "test_accuracy": [],
-    "test_loss": [],
-    "model_name": [],
-    "target_domain": [],
-}
-
 indices = tuple(range(4))
 
 os.makedirs("weights", exist_ok=True)
 
-for i, model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
-    product(indices, model_names, params_list, target_domains),
-    total=(len(indices) * len(model_names) * len(params_list) * len(target_domains)),
-    desc="Running combinations",
-):
-    SAVE_PATH = (
-        f"{dataset_name}_{model_name}_{augmentation_desc}_{target_domain}_{i}.pth"
-    )
-    if SAVE_PATH in os.listdir("weights"):
-        print("skip", SAVE_PATH)
-        continue
-    print(SAVE_PATH)
+if __name__ == "__main__":
+    for i, model_name, (augmentation_desc, augmentation_params), target_domain in tqdm(
+        product(indices, model_names, params_list, target_domains),
+        total=(
+            len(indices) * len(model_names) * len(params_list) * len(target_domains)
+        ),
+        desc="Running combinations",
+    ):
+        SAVE_PATH = (
+            f"{dataset_name}_{model_name}_{augmentation_desc}_{target_domain}_{i}.pth"
+        )
+        if SAVE_PATH in os.listdir("weights"):
+            print("skip", SAVE_PATH)
+            continue
+        print(SAVE_PATH)
 
-    params = deepcopy(DEFAULT_PARAMS)
-    params.update(augmentation_params)
-    params["TARGET_DOMAIN"] = target_domain
+        params = deepcopy(DEFAULT_PARAMS)
+        params.update(augmentation_params)
+        params["TARGET_DOMAIN"] = target_domain
 
-    loss, accuracy, weights = start_training(
-        target_domain=target_domain,
-        model_name=model_name,
-        pretrained=False,
-        params=params,
-    )
-    torch.save(weights, os.path.join("weights", SAVE_PATH))
-    print("loss", loss, "accuracy", accuracy)
-    builder["test_accuracy"].append(accuracy)
-    builder["test_loss"].append(loss)
-    builder["model_name"].append(model_name)
-    builder["target_domain"].append(target_domain)
+        loss, accuracy, weights = start_training(
+            target_domain=target_domain,
+            model_name=model_name,
+            pretrained=False,
+            params=params,
+        )
+        torch.save(weights, os.path.join("weights", SAVE_PATH))
+        print("loss", loss, "accuracy", accuracy)
 
-    del weights
-    gc.collect()
-    torch.cuda.empty_cache()
+        del weights
+        gc.collect()
+        torch.cuda.empty_cache()
 
-builder["dataset_name"] = dataset_name
-df = pd.DataFrame(builder)
-df.to_csv("results_comparision_study.csv")
-print("done")
+    print("done")

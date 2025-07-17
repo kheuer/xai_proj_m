@@ -1,5 +1,6 @@
 import os
 import gc
+from copy import deepcopy
 from tqdm import tqdm
 import pandas as pd
 from torch import load, nn
@@ -9,15 +10,17 @@ from dataset_utils import all_datasets, split_df
 from utils import split_df_into_loaders
 from cuda import device
 from torch.cuda import empty_cache
+from train_for_comparision_study import params_list
+from config import DEFAULT_PARAMS
 
 dataset_name = "pacs"
 dataset = all_datasets[dataset_name]
 
 builder = {
+    "dataset_name": [],
     "taget_domain": [],
     "architecture": [],
-    "pretrained": [],
-    "augmented": [],
+    "augmentations": [],
     "test_loss": [],
     "test_accuracy": [],
     "i": [],
@@ -26,17 +29,15 @@ builder = {
 
 def main():
     for filename in tqdm(os.listdir("weights")):
-        architecture, target_domain, pretrained, augmented, i = filename.replace(
+        dataset_name, architecture, augmentations, target_domain, i = filename.replace(
             "art_painting", "art-painting"
         ).split("_")
-        i = i.removesuffix(".pth")
+        i = int(i.removesuffix(".pth"))
         if target_domain == "art-painting":
             target_domain = "art_painting"
-        pretrained = pretrained.startswith("True")
-        augmented = augmented.startswith("True")
         if architecture == "ResNet18":
             model = get_resnet_18(pretrained=False, dataset_name=dataset_name)
-        else:
+        elif architecture == "ResNet50":
             model = get_resnet_50(pretrained=False, dataset_name=dataset_name)
 
         state_dict = load(os.path.join("weights", filename), map_location=device)
@@ -47,19 +48,25 @@ def main():
             df=dataset["df"], target_domain=target_domain
         )
 
-        transformation_pipeline = get_transform_pipeline(
-            params={
-                "TRANSFORMATIONS_ORDER": "",
-            }
-        )
+        found = False
+        for desc, params_candidate in params_list:
+            if desc == augmentations:
+                params = deepcopy(DEFAULT_PARAMS)
+                params.update(params_candidate)
+                params["TARGET_DOMAIN"] = target_domain
+                found = True
+                break
+        assert found
+        print(filename)
+        transformation_pipeline = get_transform_pipeline(params=params)
 
-        builder["taget_domain"].append(target_domain)
+        builder["dataset_name"].append(dataset_name)
         builder["architecture"].append(architecture)
-        builder["pretrained"].append(pretrained)
-        builder["augmented"].append(augmented)
+        builder["augmentations"].append(augmentations)
+        builder["taget_domain"].append(target_domain)
         builder["i"].append(i)
 
-        loss, accuracy = _do_eval(
+        loss, accuracy, _, _ = _do_eval(
             model=model,
             criterion=get_criterion(train_loader),
             dataloader=test_loader,
@@ -78,6 +85,7 @@ def main():
     gc.collect()
     empty_cache()
     df = pd.DataFrame(builder)
+    df["pretrained"] = False
     df.to_csv("results.csv")
     print(df)
     return df
