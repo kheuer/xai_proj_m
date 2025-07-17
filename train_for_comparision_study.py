@@ -1,4 +1,4 @@
-import os.path
+import os
 import json
 import re
 import gc
@@ -91,10 +91,10 @@ params_list = [
             "ALPHA": 0.73,
             "ALL_OPS": True,
             "INTERPOLATION": "BILINEAR",
-            # jigsaw
-            "USE_JIGSAW": True,
-            "MIN_GRID_SIZE": 2,
-            "MAX_GRID_SIZE": 5,
+            # Fourier
+            "USE_FOURIER": True,
+            "SQUARE_SIZE": 72,
+            "ETA": 0.4767002143366463,
         },
     ),
 ]
