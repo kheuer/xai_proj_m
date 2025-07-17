@@ -57,6 +57,7 @@ def get_transform_pipeline(params: dict) -> Callable:
             transformations.append(augmix)
 
         elif fn == "Fourier" and params.get("USE_FOURIER"):
+            collect.append(fn)
             if "SQUARE_SIZE_SINGLE_SIDE" in params:
                 square_size = params["SQUARE_SIZE_SINGLE_SIDE"]
             elif "SQUARE_SIZE" in params:
