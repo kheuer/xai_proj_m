@@ -212,8 +212,9 @@ def calculate_val_loss(
         if trial:
             trial.report(val_losses[-1], step=epoch)
 
-    # Load the best model weights
-    # model.load_state_dict(best_model_weights) # saved from variable
+    # memory management
+    model.to("cpu")
+    del model
     best_index = val_losses.index(best_loss)
     test_loss = test_losses[best_index]
     corresponding_accuracy = test_accuracies[best_index]
