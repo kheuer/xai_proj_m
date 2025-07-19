@@ -15,8 +15,6 @@ tar xf "$WORK/camelyon17.tar.gz" -C "$TMPDIR"
 #cp -r "$WORK/studies" "$TMPDIR"
 #copy .tar to local ssd and unzip is done in script
 #copy only checkpoints to $work during running
-#python3 /home/woody/barz/barz129h/xai_proj_m/train.py
-/home/woody/barz/barz129h/xai_proj_m/jobs.sh
+python3 /home/woody/barz/barz129h/xai_proj_m/validate_results.py --dataset_name camelyon
 
-cp -r "$TMPDIR/trials" "$WORK"
-#cp -r "$TMPDIR/studies" "$WORK"
+cp "$TMPDIR/results.csv" "$WORK"
