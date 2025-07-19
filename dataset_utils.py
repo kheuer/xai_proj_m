@@ -73,9 +73,9 @@ pacs_df = pd.DataFrame(builder)
 pacs_classes = pacs_df["labels"].unique().tolist()
 pacs_df["labels"] = pacs_df["labels"].map(lambda x: pacs_classes.index(x))
 
-
 # Build the Camelyon Dataframe
-builder = {"labels": [], "image": [], "domain": []}
+builder_balanced = {"labels": [], "image": [], "domain": []}
+builder_unbalanced = {"labels": [], "image": [], "domain": []}
 
 path = os.path.join(
     os.environ.get("TMPDIR", ""), "camelyon17/data/camelyon17_v1.0/metadata.csv"
@@ -88,33 +88,48 @@ if os.path.exists(path):
     categories = [TUMOR, NO_TUMOR]
     nodes = [0, 1, 2, 3]
     combinations = list(itertools.product(categories, nodes))
-    imgs_per_combination = total_images // len(combinations)
-    selected_rows = []
+    # imgs_per_combination = total_images // len(combinations)
+
     pre_path = os.path.join(
         os.environ.get("TMPDIR", ""), "camelyon17/data/camelyon17_v1.0/patches"
     )
 
-    for category, node in combinations:
-        tmp = df[(df["tumor"] == category) & (df["node"] == node)].head(
-            imgs_per_combination
-        )
-        for index, row in tmp.iterrows():
-            patient = row["patient"]
-            x = row["x_coord"]
-            y = row["y_coord"]
-            num = row["Unnamed: 0"]
-            img_path = os.path.join(
-                pre_path,
-                f"patient_{str(patient).zfill(3)}_node_{node}",
-                f"patch_patient_{str(patient).zfill(3)}_node_{node}_x_{x}_y_{y}.png",
-            )
-            builder["labels"].append(category)
-            builder["domain"].append(str(node))
-            builder["image"].append(img_path)
+    def get_dataset_with_ratio(tumor_to_no_tumor_ratio: float):
+        ratio_imgs_for_combination = [tumor_to_no_tumor_ratio if tumor == 1 else 1 - tumor_to_no_tumor_ratio for
+                                      tumor, _ in combinations]
 
-camelyon_df = pd.DataFrame(builder)
-camelyon_classes = camelyon_df["labels"].unique().tolist()
-camelyon_df["labels"] = camelyon_df["labels"].map(lambda x: camelyon_classes.index(x))
+        # Build the Camelyon Dataframe
+        camelyon_builder = {"labels": [], "image": [], "domain": []}
+
+        imgs_per_node = total_images // len(nodes)
+
+        for ratio, (category, node) in zip(ratio_imgs_for_combination, combinations):
+            print(f"category: {category} on node: {node}, num_imgages: {int(ratio * imgs_per_node)}")
+            tmp = df[(df["tumor"] == category) & (df["node"] == node)].head(int(ratio * imgs_per_node))
+            for index, row in tmp.iterrows():
+                patient = row["patient"]
+                x = row["x_coord"]
+                y = row["y_coord"]
+                num = row["Unnamed: 0"]
+                img_path = os.path.join(
+                    pre_path,
+                    f"patient_{str(patient).zfill(3)}_node_{node}",
+                    f"patch_patient_{str(patient).zfill(3)}_node_{node}_x_{x}_y_{y}.png"
+                )
+                camelyon_builder["labels"].append(category)
+                camelyon_builder["domain"].append(str(node))
+                camelyon_builder["image"].append(img_path)
+        return camelyon_builder
+
+    builder_balanced = get_dataset_with_ratio(0.5)
+    builder_unbalanced = get_dataset_with_ratio(0.02)
+
+
+camelyon_df_balanced = pd.DataFrame(builder_balanced)
+camelyon_df_unbalanced = pd.DataFrame(builder_unbalanced)
+camelyon_classes = camelyon_df_balanced["labels"].unique().tolist()
+camelyon_df_balanced["labels"] = camelyon_df_balanced["labels"].map(lambda x: camelyon_classes.index(x))
+camelyon_df_unbalanced["labels"] = camelyon_df_unbalanced["labels"].map(lambda x: camelyon_classes.index(x))
 
 
 all_datasets = {
@@ -125,11 +140,17 @@ all_datasets = {
         "shape": (3, 227, 227),
     },
     "camelyon": {
-        "df": camelyon_df,
+        "df": camelyon_df_balanced,
         "classes": camelyon_classes,
-        "domains": list(camelyon_df["domain"].unique()),
+        "domains": list(camelyon_df_balanced["domain"].unique()),
         "shape": (4, 227, 227),
     },
+    "camelyon_unbalanced": {
+            "df": camelyon_df_unbalanced,
+            "classes": camelyon_classes,
+            "domains": list(camelyon_df_unbalanced["domain"].unique()),
+            "shape": (4, 227, 227),
+        },
 }
 
 resizer = Compose([transforms.Resize((227, 227))])

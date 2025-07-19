@@ -17,9 +17,9 @@ from torch.cuda import empty_cache
 from train_for_comparision_study import params_list
 from config import DEFAULT_PARAMS
 
-dataset_name = "camelyon"
+dataset_name = "camelyon_unbalanced"
 dataset = all_datasets[dataset_name]
-
+label_mean = dataset["df"]["labels"].mean()
 builder = {
     "dataset_name": [],
     "taget_domain": [],
@@ -28,6 +28,11 @@ builder = {
     "test_loss": [],
     "test_accuracy": [],
     "i": [],
+    "tp": [],
+    "tn": [],
+    "fp": [],
+    "fn": [],
+    "auc-score": []
 }
 
 
@@ -76,17 +81,17 @@ def main():
             dataloader=test_loader,
             transformation_pipeline=transformation_pipeline,
         )
-        if dataset_name == "camelyon":
-            probabilities = torch.softmax(all_logits, dim=1)
-            auc_value = roc_auc_score(all_labels, probabilities[:, 1])
+        if "camelyon" in dataset_name:
+            probabilities = torch.softmax(torch.tensor(all_logits), dim=1)
+            auc_value = roc_auc_score(all_labels, probabilities[:, 0])
             predicted = np.argmax(probabilities, axis=1)
             # model learned to classify tumor as 0 and no tumor as 1
-            # swap values later
-            tn, fp, fn, tp = confusion_matrix(all_labels, predicted).ravel()
-            builder["tp"].append(tn)
-            builder["tn"].append(tp)
-            builder["fp"].append(fn)
-            builder["fn"].append(fp)
+            # swap values
+            tn, fp, fn, tp = confusion_matrix(all_labels, predicted, labels=[1,0]).ravel()
+            builder["tp"].append(tp)
+            builder["tn"].append(tn)
+            builder["fp"].append(fp)
+            builder["fn"].append(fn)
             builder["auc-score"].append(auc_value)
 
         builder["test_loss"].append(loss)
