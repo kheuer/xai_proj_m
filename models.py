@@ -258,7 +258,7 @@ def _do_eval(
     validation_loss = 0.0
     correct = 0
     total = 0
-    all_probabilities = []
+    all_logits = []
     all_labels = []
 
     with torch.no_grad():
@@ -271,7 +271,7 @@ def _do_eval(
             validation_loss += loss.item()
 
             all_labels.append(np.array(labels.detach().cpu()))
-            all_probabilities.append(np.array(outputs.detach().cpu()))
+            all_logits.append(np.array(outputs.detach().cpu()))
 
             # Calculate predictions and compare to labels
             _, predicted = torch.max(outputs, 1)
@@ -283,6 +283,6 @@ def _do_eval(
     return (
         avg_loss,
         accuracy,
-        np.concatenate(all_probabilities, axis=0),
+        np.concatenate(all_logits, axis=0),
         np.concatenate(all_labels, axis=0),
     )

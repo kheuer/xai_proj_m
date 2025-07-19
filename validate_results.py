@@ -1,6 +1,10 @@
 import os
 import gc
 from copy import deepcopy
+
+import numpy as np
+import torch
+from sklearn.metrics import roc_auc_score, confusion_matrix
 from tqdm import tqdm
 import pandas as pd
 from torch import load, nn
@@ -13,7 +17,7 @@ from torch.cuda import empty_cache
 from train_for_comparision_study import params_list
 from config import DEFAULT_PARAMS
 
-dataset_name = "pacs"
+dataset_name = "camelyon"
 dataset = all_datasets[dataset_name]
 
 builder = {
@@ -66,12 +70,25 @@ def main():
         builder["taget_domain"].append(target_domain)
         builder["i"].append(i)
 
-        loss, accuracy, _, _ = _do_eval(
+        loss, accuracy, all_logits, all_labels = _do_eval(
             model=model,
             criterion=get_criterion(train_loader),
             dataloader=test_loader,
             transformation_pipeline=transformation_pipeline,
         )
+        if dataset_name == "camelyon":
+            probabilities = torch.softmax(all_logits, dim=1)
+            auc_value = roc_auc_score(all_labels, probabilities[:, 1])
+            predicted = np.argmax(probabilities, axis=1)
+            # model learned to classify tumor as 0 and no tumor as 1
+            # swap values later
+            tn, fp, fn, tp = confusion_matrix(all_labels, predicted).ravel()
+            builder["tp"].append(tn)
+            builder["tn"].append(tp)
+            builder["fp"].append(fn)
+            builder["fn"].append(fp)
+            builder["auc-score"].append(auc_value)
+
         builder["test_loss"].append(loss)
         builder["test_accuracy"].append(accuracy)
 
