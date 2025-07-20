@@ -16,7 +16,7 @@ from utils import split_df_into_loaders
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--dataset_name", required=False, type=str, choices=["pacs", "camelyon"]
+    "--dataset_name", required=False, type=str, choices=["pacs", "camelyon", "camelyon_unbalanced"]
 )
 
 args = parser.parse_args()
@@ -47,7 +47,7 @@ def start_training(target_domain: str, model_name: str, pretrained: bool, params
 model_names = ["ResNet18", "ResNet50"]
 if dataset_name == "pacs":
     target_domains = ["art_painting", "cartoon", "photo", "sketch"]
-elif dataset_name == "camelyon":
+elif dataset_name == "camelyon" or dataset_name == "camelyon_unbalanced":
     target_domains = ["0", "1", "2", "3"]
 else:
     raise ValueError(f"invalid dataset_name: {dataset_name}")

@@ -1,8 +1,6 @@
-python3 /home/woody/barz/barz129h/xai_proj_m/tuner.py --model ResNet18 --pretrained False --transformations False --targetdomain 0
+python3 /home/woody/barz/barz129h/xai_proj_m/validate_results.py --dataset_name camelyon
 
-python3 /home/woody/barz/barz129h/xai_proj_m/tuner.py --model ResNet18 --pretrained False --transformations False --targetdomain 1
+python3 /home/woody/barz/barz129h/xai_proj_m/validate_results.py --dataset_name camelyon_unbalanced
 
-python3 /home/woody/barz/barz129h/xai_proj_m/tuner.py --model ResNet18 --pretrained False --transformations False --targetdomain 2
 
-python3 /home/woody/barz/barz129h/xai_proj_m/tuner.py --model ResNet18 --pretrained False --transformations False --targetdomain 3
 
