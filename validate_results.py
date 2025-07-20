@@ -47,16 +47,16 @@ builder = {
 
 def main():
     for filename in tqdm(os.listdir("weights")):
-        dataset_name, architecture, augmentations, target_domain, i = filename.replace(
+        trained_dataset_name, architecture, augmentations, target_domain, i = filename.replace(
             "art_painting", "art-painting"
         ).split("_")
         i = int(i.removesuffix(".pth"))
         if target_domain == "art-painting":
             target_domain = "art_painting"
         if architecture == "ResNet18":
-            model = get_resnet_18(pretrained=False, dataset_name=dataset_name)
+            model = get_resnet_18(pretrained=False, dataset_name=trained_dataset_name)
         elif architecture == "ResNet50":
-            model = get_resnet_50(pretrained=False, dataset_name=dataset_name)
+            model = get_resnet_50(pretrained=False, dataset_name=trained_dataset_name)
 
         state_dict = load(os.path.join("weights", filename), map_location=device)
         model.load_state_dict(state_dict)
