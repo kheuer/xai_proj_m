@@ -177,13 +177,12 @@ cython_debug/
 tmp.ipynb
 pacs-dataset.zip
 pacs-dataset/*
-results/*
+results/runs/*
 *.png
 runs/*
 output_images
 *.pth
 *.tar.gz
 final_results.txt
-*.csv
 *.ipynb
 /camelyon17/
