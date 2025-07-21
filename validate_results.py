@@ -21,7 +21,11 @@ from config import DEFAULT_PARAMS
 dataset_name = "camelyon_unbalanced"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--dataset_name", required=False, choices=["pacs", "camelyon", "camelyon_unbalanced"])
+parser.add_argument(
+    "--dataset_name",
+    required=False,
+    choices=["pacs", "camelyon", "camelyon_unbalanced"],
+)
 args = parser.parse_args()
 
 if args.dataset_name is not None:
@@ -41,15 +45,15 @@ builder = {
     "tn": [],
     "fp": [],
     "fn": [],
-    "auc-score": []
+    "auc-score": [],
 }
 
 
 def main():
     for filename in tqdm(os.listdir("weights")):
-        trained_dataset_name, architecture, augmentations, target_domain, i = filename.replace(
-            "art_painting", "art-painting"
-        ).split("_")
+        trained_dataset_name, architecture, augmentations, target_domain, i = (
+            filename.replace("art_painting", "art-painting").split("_")
+        )
         i = int(i.removesuffix(".pth"))
         if target_domain == "art-painting":
             target_domain = "art_painting"
@@ -94,19 +98,27 @@ def main():
             probabilities = torch.softmax(torch.tensor(all_logits), dim=1)
             # model learned to classify tumor as 0 and no tumor as 1
             # swap labels for tumor = 1 and no tumor = 0
-            inverted_labels = np.array([1-y for y in all_labels])
+            inverted_labels = np.array([1 - y for y in all_labels])
             auc_value = roc_auc_score(inverted_labels, probabilities[:, 0])
 
             predicted = np.argmax(probabilities.numpy(), axis=1)
-            predicted_inverted = np.array([1-pred for pred in predicted])
+            predicted_inverted = np.array([1 - pred for pred in predicted])
             # model learned to classify tumor as 0 and no tumor as 1
             # swap values
-            tn, fp, fn, tp = confusion_matrix(inverted_labels, predicted_inverted).ravel()
+            tn, fp, fn, tp = confusion_matrix(
+                inverted_labels, predicted_inverted
+            ).ravel()
             builder["tp"].append(tp)
             builder["tn"].append(tn)
             builder["fp"].append(fp)
             builder["fn"].append(fn)
             builder["auc-score"].append(auc_value)
+        else:
+            builder["tp"].append(None)
+            builder["tn"].append(None)
+            builder["fp"].append(None)
+            builder["fn"].append(None)
+            builder["auc-score"].append(None)
 
         builder["test_loss"].append(loss)
         builder["test_accuracy"].append(accuracy)

@@ -1,0 +1,193 @@
+,dataset_name,taget_domain,architecture,augmentations,test_loss,test_accuracy,i,tp,tn,fp,fn,auc-score,pretrained
+0,pacs,cartoon,ResNet50,No Augmentations,2.2585260288135425,0.2529863481228669,3,,,,,,False
+1,pacs,art_painting,ResNet50,Fourier,1.958069458603859,0.24462890625,2,,,,,,False
+2,pacs,art_painting,ResNet18,No Augmentations,2.43343404494226,0.26171875,0,,,,,,False
+3,pacs,art_painting,ResNet18,Augmix,2.435233758762479,0.298828125,0,,,,,,False
+4,pacs,sketch,ResNet18,Augmix,1.8996217599729213,0.31865614660218883,0,,,,,,False
+5,pacs,cartoon,ResNet18,Dlow,1.8509985836776528,0.3212457337883959,2,,,,,,False
+6,pacs,art_painting,ResNet18,Augmix and Fourier,1.820199802517891,0.3447265625,3,,,,,,False
+7,pacs,art_painting,ResNet18,No Augmentations,2.5497646015137434,0.26611328125,2,,,,,,False
+8,pacs,art_painting,ResNet50,Augmix and Fourier,1.8810120839625597,0.2470703125,3,,,,,,False
+9,pacs,photo,ResNet18,Augmix,1.4578465122096944,0.48323353293413174,2,,,,,,False
+10,pacs,art_painting,ResNet50,Jigsaw,2.6729157380759716,0.20556640625,1,,,,,,False
+11,pacs,art_painting,ResNet18,Jigsaw,2.6464971732348204,0.2626953125,2,,,,,,False
+12,pacs,art_painting,ResNet50,Augmix,2.5751675069332123,0.25,0,,,,,,False
+13,pacs,cartoon,ResNet50,Jigsaw,2.5881791759181665,0.17022184300341298,0,,,,,,False
+14,pacs,cartoon,ResNet50,Dlow,2.0451150504318445,0.23592150170648465,0,,,,,,False
+15,pacs,cartoon,ResNet18,Dlow,1.978955776304812,0.29223549488054607,1,,,,,,False
+16,pacs,sketch,ResNet50,Augmix and Fourier,1.778571627973541,0.2708068210740647,3,,,,,,False
+17,pacs,cartoon,ResNet50,Jigsaw,2.7136856414176322,0.1924061433447099,3,,,,,,False
+18,pacs,photo,ResNet18,Dlow,1.4445334470496987,0.4281437125748503,3,,,,,,False
+19,pacs,art_painting,ResNet18,Augmix and Fourier,1.9237338323146105,0.3056640625,0,,,,,,False
+20,pacs,sketch,ResNet18,Augmix,1.9178424695642984,0.3278187834054467,3,,,,,,False
+21,pacs,art_painting,ResNet18,Jigsaw,2.6524488274008036,0.2548828125,0,,,,,,False
+22,pacs,sketch,ResNet18,Jigsaw,2.206080427983912,0.1628913209468058,0,,,,,,False
+23,pacs,art_painting,ResNet18,Augmix,2.319246204569936,0.25537109375,1,,,,,,False
+24,pacs,sketch,ResNet50,Dlow,1.7597642032111562,0.3082209213540341,1,,,,,,False
+25,pacs,art_painting,ResNet18,Augmix and Fourier,1.9772383160889149,0.30712890625,2,,,,,,False
+26,pacs,art_painting,ResNet50,Dlow,2.0272393990308046,0.22998046875,2,,,,,,False
+27,pacs,sketch,ResNet50,Dlow,1.674487169195966,0.3133112751336218,2,,,,,,False
+28,pacs,art_painting,ResNet18,Dlow,1.9847813807427883,0.26513671875,3,,,,,,False
+29,pacs,art_painting,ResNet50,Augmix,2.348064746707678,0.26123046875,2,,,,,,False
+30,pacs,photo,ResNet18,Jigsaw,1.7785374758378514,0.3209580838323353,0,,,,,,False
+31,pacs,cartoon,ResNet18,Jigsaw,2.603468712922689,0.28924914675767915,3,,,,,,False
+32,pacs,cartoon,ResNet18,Fourier,1.5652197341661196,0.3869453924914676,2,,,,,,False
+33,pacs,art_painting,ResNet50,Augmix and Fourier,1.8696026932448149,0.26611328125,0,,,,,,False
+34,pacs,cartoon,ResNet18,No Augmentations,1.951542084281509,0.3656143344709898,1,,,,,,False
+35,pacs,cartoon,ResNet50,No Augmentations,2.100947170644193,0.25554607508532423,1,,,,,,False
+36,pacs,sketch,ResNet50,Augmix,1.941335574398196,0.28862305930262155,1,,,,,,False
+37,pacs,cartoon,ResNet50,Fourier,1.8583039512505402,0.22098976109215018,2,,,,,,False
+38,pacs,cartoon,ResNet50,Fourier,1.827840632683522,0.2380546075085324,0,,,,,,False
+39,pacs,sketch,ResNet50,Augmix,1.913077060769244,0.2733519979638585,2,,,,,,False
+40,pacs,photo,ResNet50,Jigsaw,1.6711042129768516,0.4029940119760479,0,,,,,,False
+41,pacs,cartoon,ResNet50,Augmix,2.3764652948121765,0.26791808873720135,0,,,,,,False
+42,pacs,sketch,ResNet50,Fourier,1.7361026827881976,0.2667345380503945,1,,,,,,False
+43,pacs,sketch,ResNet18,Fourier,1.6820841727218008,0.3331636548740137,1,,,,,,False
+44,pacs,sketch,ResNet18,Fourier,1.8147108535456464,0.2697887503181471,2,,,,,,False
+45,pacs,cartoon,ResNet18,No Augmentations,2.62848194386508,0.3370307167235495,3,,,,,,False
+46,pacs,sketch,ResNet18,Augmix and Fourier,1.7972781619405358,0.27437006871977604,0,,,,,,False
+47,pacs,cartoon,ResNet50,Augmix,2.0116904539030953,0.29650170648464164,2,,,,,,False
+48,pacs,sketch,ResNet18,No Augmentations,3.763978101373688,0.09162636803257826,1,,,,,,False
+49,pacs,sketch,ResNet50,Jigsaw,1.8119821092946742,0.2545176889793841,1,,,,,,False
+50,pacs,photo,ResNet50,Fourier,1.6310094190093707,0.3844311377245509,3,,,,,,False
+51,pacs,sketch,ResNet50,No Augmentations,1.8362515903100736,0.2853143293458895,1,,,,,,False
+52,pacs,cartoon,ResNet50,Fourier,1.9690670435493056,0.2098976109215017,3,,,,,,False
+53,pacs,art_painting,ResNet50,No Augmentations,2.3280174136161804,0.23046875,3,,,,,,False
+54,pacs,sketch,ResNet50,No Augmentations,2.2843921232998854,0.22906592008144566,2,,,,,,False
+55,pacs,art_painting,ResNet50,Dlow,2.0268698278814554,0.23095703125,1,,,,,,False
+56,pacs,photo,ResNet50,Fourier,1.619540126818531,0.39221556886227543,1,,,,,,False
+57,pacs,sketch,ResNet18,Dlow,1.6704972536583258,0.3494527869686943,2,,,,,,False
+58,pacs,photo,ResNet18,Fourier,1.430132067428445,0.46526946107784434,3,,,,,,False
+59,pacs,photo,ResNet50,No Augmentations,1.6131084932471222,0.4101796407185629,0,,,,,,False
+60,pacs,cartoon,ResNet50,Augmix,2.0532504980628556,0.295221843003413,1,,,,,,False
+61,pacs,cartoon,ResNet18,Augmix,1.9438366342235256,0.43600682593856654,2,,,,,,False
+62,pacs,cartoon,ResNet50,Dlow,2.0276669118855453,0.23890784982935154,2,,,,,,False
+63,pacs,art_painting,ResNet18,Fourier,2.017124390229583,0.29931640625,3,,,,,,False
+64,pacs,sketch,ResNet50,No Augmentations,1.9163512970373882,0.30593026215321967,0,,,,,,False
+65,pacs,art_painting,ResNet50,Jigsaw,2.751352034509182,0.19921875,0,,,,,,False
+66,pacs,cartoon,ResNet18,Fourier,1.7625473769935402,0.34257679180887374,3,,,,,,False
+67,pacs,photo,ResNet18,Augmix,1.3167068131689756,0.5227544910179641,3,,,,,,False
+68,pacs,art_painting,ResNet50,No Augmentations,2.703669434413314,0.23095703125,0,,,,,,False
+69,pacs,art_painting,ResNet18,Augmix,2.4248964320868254,0.31201171875,2,,,,,,False
+70,pacs,cartoon,ResNet50,Fourier,1.920929333648166,0.2197098976109215,1,,,,,,False
+71,pacs,sketch,ResNet18,No Augmentations,3.224184794154594,0.18783405446678544,0,,,,,,False
+72,pacs,photo,ResNet18,Jigsaw,1.5042243318737678,0.4562874251497006,2,,,,,,False
+73,pacs,photo,ResNet50,Fourier,1.6134613707380474,0.38323353293413176,2,,,,,,False
+74,pacs,sketch,ResNet18,Fourier,1.7979273611937112,0.30643929753117843,0,,,,,,False
+75,pacs,photo,ResNet50,Augmix,1.485134965968582,0.4287425149700599,0,,,,,,False
+76,pacs,photo,ResNet18,Fourier,1.4918970859275673,0.4347305389221557,0,,,,,,False
+77,pacs,sketch,ResNet50,Dlow,1.7308991876074937,0.3247645711376941,3,,,,,,False
+78,pacs,photo,ResNet18,Dlow,1.350937936665877,0.44550898203592815,2,,,,,,False
+79,pacs,sketch,ResNet50,Augmix and Fourier,1.899237750022392,0.17714431152965132,0,,,,,,False
+80,pacs,photo,ResNet50,Augmix,1.3991460361570682,0.4532934131736527,2,,,,,,False
+81,pacs,sketch,ResNet18,Jigsaw,1.9108133083436547,0.2708068210740647,3,,,,,,False
+82,pacs,art_painting,ResNet50,Augmix,2.4991050753742456,0.24755859375,1,,,,,,False
+83,pacs,photo,ResNet50,Jigsaw,1.6654085775591292,0.411377245508982,2,,,,,,False
+84,pacs,photo,ResNet18,Augmix and Fourier,1.3683957929881114,0.4485029940119761,2,,,,,,False
+85,pacs,photo,ResNet50,Augmix,1.5175414276572894,0.4353293413173653,3,,,,,,False
+86,pacs,sketch,ResNet50,Augmix,1.6558077199672296,0.30618477984219905,3,,,,,,False
+87,pacs,cartoon,ResNet50,Augmix and Fourier,1.8206093923465625,0.26706484641638223,2,,,,,,False
+88,pacs,art_painting,ResNet50,Dlow,1.9924876000732183,0.2333984375,3,,,,,,False
+89,pacs,art_painting,ResNet50,Augmix and Fourier,1.921951750293374,0.2431640625,1,,,,,,False
+90,pacs,art_painting,ResNet50,Augmix,2.7322690915316343,0.23779296875,3,,,,,,False
+91,pacs,photo,ResNet50,Fourier,1.598591779762844,0.39281437125748503,0,,,,,,False
+92,pacs,cartoon,ResNet50,Augmix,2.1737609425106563,0.28242320819112626,3,,,,,,False
+93,pacs,art_painting,ResNet18,Jigsaw,2.7005797289311886,0.26220703125,3,,,,,,False
+94,pacs,art_painting,ResNet18,Dlow,2.005533315241337,0.27099609375,2,,,,,,False
+95,pacs,sketch,ResNet18,Augmix,1.8575437514762567,0.31051158055484857,1,,,,,,False
+96,pacs,cartoon,ResNet18,Dlow,2.0283396550126978,0.26834470989761094,0,,,,,,False
+97,pacs,cartoon,ResNet18,Augmix and Fourier,1.6052759193085335,0.3839590443686007,2,,,,,,False
+98,pacs,photo,ResNet50,No Augmentations,1.5372847813480306,0.44610778443113774,2,,,,,,False
+99,pacs,sketch,ResNet50,Augmix and Fourier,1.756334609132472,0.24942733519979637,2,,,,,,False
+100,pacs,photo,ResNet18,Jigsaw,1.5606594535539735,0.43952095808383235,1,,,,,,False
+101,pacs,art_painting,ResNet50,Dlow,1.9956028368324041,0.2509765625,0,,,,,,False
+102,pacs,sketch,ResNet50,Fourier,1.7244648361593726,0.26444387884958004,3,,,,,,False
+103,pacs,sketch,ResNet18,Dlow,1.6458418456519521,0.34410791550012726,0,,,,,,False
+104,pacs,cartoon,ResNet18,Fourier,1.8171145899875745,0.3758532423208191,0,,,,,,False
+105,pacs,sketch,ResNet50,Jigsaw,1.958072417150668,0.22092135403410537,2,,,,,,False
+106,pacs,art_painting,ResNet18,No Augmentations,2.498765468597412,0.259765625,3,,,,,,False
+107,pacs,cartoon,ResNet18,Augmix,1.7543140770615757,0.4065699658703072,0,,,,,,False
+108,pacs,cartoon,ResNet50,No Augmentations,2.1018136401434204,0.2790102389078498,2,,,,,,False
+109,pacs,photo,ResNet50,Dlow,1.5884852949178443,0.39461077844311376,0,,,,,,False
+110,pacs,art_painting,ResNet18,Fourier,2.0274459663778543,0.306640625,2,,,,,,False
+111,pacs,sketch,ResNet50,Augmix and Fourier,1.8057827910756676,0.24230083990837364,1,,,,,,False
+112,pacs,sketch,ResNet50,Jigsaw,1.9903895593271024,0.2249936370577755,3,,,,,,False
+113,pacs,photo,ResNet18,No Augmentations,1.4883959225888521,0.47065868263473054,1,,,,,,False
+114,pacs,photo,ResNet18,Fourier,1.3911117067876853,0.4502994011976048,2,,,,,,False
+115,pacs,sketch,ResNet50,Augmix,1.9362925969488252,0.29956731992873503,0,,,,,,False
+116,pacs,cartoon,ResNet50,No Augmentations,2.1951688914685636,0.27602389078498296,0,,,,,,False
+117,pacs,cartoon,ResNet18,Jigsaw,2.6019203936731494,0.25042662116040953,0,,,,,,False
+118,pacs,art_painting,ResNet50,Fourier,2.131741415709257,0.22119140625,0,,,,,,False
+119,pacs,art_painting,ResNet18,Augmix,2.3236194495111704,0.27880859375,3,,,,,,False
+120,pacs,cartoon,ResNet50,Augmix and Fourier,1.8066095339285362,0.28924914675767915,0,,,,,,False
+121,pacs,sketch,ResNet18,No Augmentations,2.294489347837805,0.26698905573937387,3,,,,,,False
+122,pacs,photo,ResNet18,Dlow,1.3931895224553235,0.4437125748502994,0,,,,,,False
+123,pacs,cartoon,ResNet18,Augmix,2.3732078542580477,0.2815699658703072,1,,,,,,False
+124,pacs,photo,ResNet50,No Augmentations,1.569159155746676,0.4155688622754491,3,,,,,,False
+125,pacs,photo,ResNet50,Augmix and Fourier,1.6302782949411645,0.3874251497005988,2,,,,,,False
+126,pacs,art_painting,ResNet50,No Augmentations,2.6225879658013582,0.212890625,1,,,,,,False
+127,pacs,art_painting,ResNet50,Jigsaw,2.7938358560204506,0.2041015625,2,,,,,,False
+128,pacs,cartoon,ResNet18,Jigsaw,2.5206999053826205,0.22226962457337884,2,,,,,,False
+129,pacs,cartoon,ResNet18,Augmix and Fourier,1.5459267662183658,0.3924914675767918,3,,,,,,False
+130,pacs,art_painting,ResNet18,Augmix and Fourier,1.8982498534023762,0.318359375,1,,,,,,False
+131,pacs,photo,ResNet50,Dlow,1.6097888046840452,0.3790419161676647,3,,,,,,False
+132,pacs,sketch,ResNet18,Fourier,1.8383463446686907,0.27895138712140494,3,,,,,,False
+133,pacs,photo,ResNet18,No Augmentations,1.4045664195744496,0.4664670658682635,3,,,,,,False
+134,pacs,cartoon,ResNet50,Augmix and Fourier,1.8871837048917204,0.24829351535836178,3,,,,,,False
+135,pacs,sketch,ResNet50,Fourier,1.6865968209941213,0.30109442606261133,2,,,,,,False
+136,pacs,art_painting,ResNet50,No Augmentations,2.4053535386919975,0.22314453125,2,,,,,,False
+137,pacs,cartoon,ResNet18,Jigsaw,2.1679555161579236,0.3174061433447099,1,,,,,,False
+138,pacs,cartoon,ResNet18,No Augmentations,2.4453443208256282,0.20563139931740615,0,,,,,,False
+139,pacs,sketch,ResNet18,Augmix and Fourier,1.542349077821747,0.35123441079155,2,,,,,,False
+140,pacs,sketch,ResNet18,Jigsaw,2.048228684479628,0.19674217358106388,2,,,,,,False
+141,pacs,art_painting,ResNet18,Dlow,2.0311630088835955,0.2646484375,1,,,,,,False
+142,pacs,photo,ResNet50,Augmix and Fourier,1.6193546664040044,0.39281437125748503,1,,,,,,False
+143,pacs,cartoon,ResNet18,Fourier,1.6909646214665592,0.3536689419795222,1,,,,,,False
+144,pacs,sketch,ResNet18,Augmix and Fourier,1.5830847703344453,0.35174344616950876,3,,,,,,False
+145,pacs,art_painting,ResNet18,Dlow,2.0143828615546227,0.26025390625,0,,,,,,False
+146,pacs,photo,ResNet18,Augmix,1.3724232495955702,0.5179640718562875,1,,,,,,False
+147,pacs,sketch,ResNet18,Jigsaw,2.1967190038867113,0.16874522779333165,1,,,,,,False
+148,pacs,art_painting,ResNet50,Fourier,1.9767901040613651,0.2451171875,1,,,,,,False
+149,pacs,photo,ResNet18,Augmix and Fourier,1.3804603601401706,0.43293413173652695,1,,,,,,False
+150,pacs,photo,ResNet18,Fourier,1.4730603796131205,0.429940119760479,1,,,,,,False
+151,pacs,photo,ResNet50,Jigsaw,1.6365909531431377,0.4245508982035928,3,,,,,,False
+152,pacs,photo,ResNet50,No Augmentations,1.5893830510805238,0.4281437125748503,1,,,,,,False
+153,pacs,sketch,ResNet50,Dlow,1.7268520923164803,0.3163654874013744,0,,,,,,False
+154,pacs,photo,ResNet50,Jigsaw,1.6391969694281525,0.41077844311377243,1,,,,,,False
+155,pacs,art_painting,ResNet18,Jigsaw,2.792830679565668,0.251953125,1,,,,,,False
+156,pacs,sketch,ResNet18,Dlow,1.6096296271657555,0.35886994146093154,3,,,,,,False
+157,pacs,art_painting,ResNet50,Jigsaw,2.7600227408111095,0.22509765625,3,,,,,,False
+158,pacs,sketch,ResNet50,No Augmentations,2.1607008019113927,0.3082209213540341,3,,,,,,False
+159,pacs,art_painting,ResNet50,Augmix and Fourier,1.895397137850523,0.25146484375,2,,,,,,False
+160,pacs,sketch,ResNet18,No Augmentations,2.446604882798544,0.28887757699160094,2,,,,,,False
+161,pacs,photo,ResNet18,No Augmentations,1.4187694506825141,0.46467065868263474,2,,,,,,False
+162,pacs,art_painting,ResNet18,Fourier,1.980328768491745,0.22900390625,0,,,,,,False
+163,pacs,photo,ResNet18,Jigsaw,1.5064244675186444,0.4622754491017964,3,,,,,,False
+164,pacs,cartoon,ResNet18,Augmix and Fourier,1.592021284071175,0.3890784982935154,0,,,,,,False
+165,pacs,photo,ResNet18,No Augmentations,1.4916425752189924,0.47724550898203594,0,,,,,,False
+166,pacs,cartoon,ResNet18,Augmix and Fourier,1.581199138551145,0.40784982935153585,1,,,,,,False
+167,pacs,cartoon,ResNet18,No Augmentations,1.8503148217458982,0.3455631399317406,2,,,,,,False
+168,pacs,art_painting,ResNet18,Fourier,2.034074302762747,0.3046875,1,,,,,,False
+169,pacs,sketch,ResNet18,Dlow,1.529859800648883,0.3693051667090863,1,,,,,,False
+170,pacs,photo,ResNet50,Dlow,1.563762273428575,0.3964071856287425,2,,,,,,False
+171,pacs,sketch,ResNet18,Augmix and Fourier,1.66211853376249,0.3217103588699415,1,,,,,,False
+172,pacs,photo,ResNet50,Augmix and Fourier,1.5848599897240692,0.37664670658682636,0,,,,,,False
+173,pacs,cartoon,ResNet50,Augmix and Fourier,1.8463000622955528,0.2674914675767918,1,,,,,,False
+174,pacs,photo,ResNet18,Dlow,1.4131162717657269,0.4359281437125748,1,,,,,,False
+175,pacs,photo,ResNet50,Dlow,1.6281847436473054,0.34850299401197604,1,,,,,,False
+176,pacs,cartoon,ResNet18,Dlow,2.0047370050404525,0.2743174061433447,3,,,,,,False
+177,pacs,sketch,ResNet50,Jigsaw,1.8149647111815166,0.2428098752863324,0,,,,,,False
+178,pacs,cartoon,ResNet50,Dlow,2.1206822765840068,0.1864334470989761,1,,,,,,False
+179,pacs,cartoon,ResNet50,Jigsaw,2.3350932195379928,0.24914675767918087,2,,,,,,False
+180,pacs,sketch,ResNet18,Augmix,1.972237350494881,0.25120895902265206,2,,,,,,False
+181,pacs,photo,ResNet18,Augmix and Fourier,1.4025183005153008,0.45868263473053894,0,,,,,,False
+182,pacs,art_painting,ResNet50,Fourier,1.957758266478777,0.248046875,3,,,,,,False
+183,pacs,photo,ResNet18,Augmix and Fourier,1.3719280834467906,0.4532934131736527,3,,,,,,False
+184,pacs,photo,ResNet50,Augmix and Fourier,1.616345243633918,0.39461077844311376,3,,,,,,False
+185,pacs,photo,ResNet18,Augmix,1.4817571448829938,0.4598802395209581,0,,,,,,False
+186,pacs,cartoon,ResNet50,Dlow,2.013845635427011,0.2235494880546075,3,,,,,,False
+187,pacs,cartoon,ResNet18,Augmix,1.9419975973464347,0.33532423208191126,3,,,,,,False
+188,pacs,sketch,ResNet50,Fourier,1.6328028828147951,0.27844235174344617,0,,,,,,False
+189,pacs,cartoon,ResNet50,Jigsaw,2.665766976975106,0.15059726962457337,1,,,,,,False
+190,pacs,art_painting,ResNet18,No Augmentations,2.310698091983795,0.259765625,1,,,,,,False
+191,pacs,photo,ResNet50,Augmix,1.5853420316048388,0.4413173652694611,1,,,,,,False
