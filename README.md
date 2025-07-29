@@ -61,19 +61,7 @@ You will be prompted for hyperparameters. You can utilize values obtained from t
 
 
 ```
-{
-    "EPOCHS": 100,
-    "PATIENCE": 15,
-    "BATCH_SIZE": 32,
-    "LEARNING_RATE": 0.001,
-    "BETA_1": 0.9,
-    "BETA_2": 0.999,
-    "OPTIMIZER": "SGD",
-    "SCHEDULER": "CosineAnnealingLR",
-    "MOMENTUM": 0.53,
-    "DAMPENING": 0.0145,
-    "WEIGHT_DECAY": 0.0,
-}
+{"EPOCHS": 100, "PATIENCE": 15, "BATCH_SIZE": 32, "LEARNING_RATE": 0.001, "BETA_1": 0.9, "BETA_2": 0.999, "OPTIMIZER": "SGD", "SCHEDULER": "CosineAnnealingLR", "MOMENTUM": 0.53, "DAMPENING": 0.0145, "WEIGHT_DECAY": 0.0}
 ```
 
 
