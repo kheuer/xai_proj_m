@@ -54,6 +54,10 @@ def main():
         trained_dataset_name, architecture, augmentations, target_domain, i = (
             filename.replace("art_painting", "art-painting").split("_")
         )
+        if trained_dataset_name not in dataset_name:
+            # make sure the dataset matches but weights trained on camelyon_unbalanced should still match camelyon
+            continue
+
         i = int(i.removesuffix(".pth"))
         if target_domain == "art-painting":
             target_domain = "art_painting"

@@ -12,8 +12,10 @@ pretrained = {"Yes": True, "No": False}[
     get_expected_input("Use pre-trained weights? ", ("Yes", "No"))
 ]
 
-# TODO: ask the user for input when we obtain another dataset
-dataset_name = "pacs"
+dataset_name = get_expected_input(
+    "Which dataset should be used? ", ("pacs", "camelyon")
+)
+
 dataset = all_datasets[dataset_name]
 params = get_params_from_user()
 
