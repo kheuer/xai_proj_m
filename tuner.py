@@ -5,16 +5,15 @@ import os
 import shutil
 from datetime import datetime
 import optuna
-from torchvision.transforms import InterpolationMode
 from utils import get_expected_input, split_df_into_loaders
-from dataset_utils import split_domains, get_dataloader, split_df
+from dataset_utils import split_df
 from models import (
     get_resnet_18,
     get_resnet_50,
     all_datasets,
     calculate_val_loss,
 )
-from config import MAX_EPOCHS, PATIENCE, BATCH_SIZE, NUM_TRIALS, SAVE_FREQ
+from config import MAX_EPOCHS, PATIENCE, NUM_TRIALS, SAVE_FREQ
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -50,6 +49,7 @@ else:
     )
 dataset = all_datasets[dataset_name]
 
+print(dataset)
 if args.transformations is not None:
     transformations = True if args.transformations == "True" else False
 else:
