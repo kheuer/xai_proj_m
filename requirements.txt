@@ -6,3 +6,4 @@ torchvision
 matplotlib
 seaborn
 statsmodels
+datasets

@@ -165,6 +165,37 @@ def get_params_from_user():
             assert isinstance(parsed["STEP_SIZE"], int)
             params["STEP_SIZE"] = parsed["STEP_SIZE"]
 
+        if "USE_JIGSAW" in parsed:
+            params["USE_JIGSAW"] = parsed["USE_JIGSAW"]
+            if params["USE_JIGSAW"]:
+                params["MIN_GRID_SIZE"] = parsed["MIN_GRID_SIZE"]
+                params["MAX_GRID_SIZE"] = parsed["MAX_GRID_SIZE"]
+
+        if "USE_DLOW" in parsed:
+            params["USE_DLOW"] = parsed["USE_DLOW"]
+            if "target_domain" in parsed:
+                params["target_domain"] = parsed["target_domain"]
+
+        if "USE_FOURIER" in parsed:
+            params["USE_FOURIER"] = parsed["USE_FOURIER"]
+            if params["USE_FOURIER"]:
+                params["SQUARE_SIZE"] = parsed["SQUARE_SIZE"]
+                params["ETA"] = parsed["ETA"]
+
+        if "USE_AUGMIX" in parsed:
+            params["USE_AUGMIX"] = parsed["USE_AUGMIX"]
+            if params["USE_AUGMIX"]:
+                params["SEVERITY"] = parsed["SEVERITY"]
+                params["MIXTURE_WIDTH"] = parsed["MIXTURE_WIDTH"]
+                params["CHAIN_DEPTH"] = parsed["CHAIN_DEPTH"]
+                params["ALPHA"] = parsed["ALPHA"]
+                params["ALL_OPS"] = parsed["ALL_OPS"]
+                params["INTERPOLATION"] = parsed["INTERPOLATION"]
+
+        params["TRANSFORMATIONS_ORDER"] = parsed.get(
+            "TRANSFORMATIONS_ORDER", "Augmix,Dlow,Fourier,Jigsaw"
+        )
+
         return params
 
     except ValueError:

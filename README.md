@@ -54,14 +54,14 @@ To train a model with specific hyperparameter combinations and obtain the test l
 
 
 ```
-python tuner.py
+python experiment.py
 ```
 
 You will be prompted for hyperparameters. You can utilize values obtained from the tuner, create your own, or use the following defaults:
 
 
 ```
-{"EPOCHS": 100, "PATIENCE": 15, "BATCH_SIZE": 32, "LEARNING_RATE": 0.001, "BETA_1": 0.9, "BETA_2": 0.999, "OPTIMIZER": "SGD", "SCHEDULER": "CosineAnnealingLR", "MOMENTUM": 0.53, "DAMPENING": 0.0145, "WEIGHT_DECAY": 0.0}
+{"EPOCHS": 100, "PATIENCE": 15, "BATCH_SIZE": 32, "LEARNING_RATE": 0.001, "BETA_1": 0.9, "BETA_2": 0.999, "OPTIMIZER": "SGD", "SCHEDULER": "CosineAnnealingLR", "MOMENTUM": 0.53, "DAMPENING": 0.0145, "WEIGHT_DECAY": 0.0, "TRANSFORMATIONS_ORDER": "Fourier,Augmix,Dlow,Jigsaw", "USE_AUGMIX": True, "SEVERITY": 3, "MIXTURE_WIDTH": 3, "CHAIN_DEPTH": -1, "ALPHA": 0.73, "ALL_OPS": True, "INTERPOLATION": "BILINEAR", "USE_FOURIER": True, "SQUARE_SIZE": 72, "ETA": 0.4767002143366463, "USE_DLOW": True, "USE_JIGSAW": True, "MIN_GRID_SIZE": 2, "MAX_GRID_SIZE": 5}
 ```
 
 
@@ -87,3 +87,5 @@ python validate_results.py --dataset_name pacs
 python validate_results.py --dataset_name camelyon
 python validate_results.py --dataset_name camelyon_unbalanced
 ```
+
+This will create some csv files in the format results_{dataset_name}.csv in your projects root directory.
