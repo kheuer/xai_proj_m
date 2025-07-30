@@ -24,6 +24,8 @@ train_loader, val_loader, test_loader, target_domain = split_df_into_loaders(
 )
 
 params["target_domain"] = target_domain
+params["TARGET_DOMAIN"] = target_domain
+
 
 print(
     f"\n\n\nTrain {model_name} model with target_domain = {target_domain}, pretrained = {pretrained} and Hyperparameters = {params}"
